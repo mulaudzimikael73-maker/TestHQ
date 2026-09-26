@@ -5,8 +5,12 @@ const STOCKS=[
  ["CEH","Chocolate Emergency Holdings"],["BOM","Bank of Micky Financial Group"],["GOBS","The Daily Gobshite Media"],["EVLY","Eventually Airways"],["POTA","Potato Industries International"],["PAIR","Premium Air Ltd"],["PAPR","Micky’s Executive Paperclips"],["BTW","Bluetooth Water Co."],["TFF","Tax Fraud Flakes Foods"],["NAPS","Department of Naps PLC"],["RDFL","RedFlagr Technologies"],["QDBV","Questionable Decisions Beverages"],["ICE","Micky Premium Ice Cubes"],["CHIP","One Chip Delivery Group"],["BAG","Invisible Handbag Holdings"],["LOAD","Eau de Loadshedding Fragrance House"],["NITE","Indoor Night Sunglasses Inc."],["ROCK","Luxury Rock Corporation"],["TUES","Tuesday Global"],["SCIG","Suspiciously Cheap Insurance Group"],["FASH","Fashionista Designer Shoes Group"]
 ];
 const MAX_MEDIA=16*1024*1024;
-let snapshot=null,timer=null;
+const FULFILLED_KEY="testhq-ent-fulfilled-v1";
+let snapshot=null,timer=null,lastDeliveryMsg="";
 const selectedFiles=new Map();
+function loadFulfilled(){try{return new Set(JSON.parse(localStorage.getItem(FULFILLED_KEY)||"[]"))}catch{return new Set()}}
+const fulfilledIds=loadFulfilled();
+function saveFulfilled(){try{localStorage.setItem(FULFILLED_KEY,JSON.stringify([...fulfilledIds].slice(-150)))}catch{}}
 
 if($("worldStock"))$("worldStock").innerHTML=STOCKS.map(([t,n])=>`<option value="${t}">${t} — ${esc(n)}</option>`).join("");
 
@@ -48,8 +52,9 @@ function render(){
  const prices=$("worldPrices"),purchases=$("worldPurchases"),status=$("worldEntStatus");if(!prices||!purchases)return;
  const stocks=snapshot?.stocks||[];
  prices.innerHTML=stocks.length?stocks.map(s=>`<div><span><b>${esc(s.ticker)}</b> ${esc(s.name)}</span><strong>${Number(s.price||0).toFixed(2).replace(/\.00$/,'')} MB ${s.frozen?'❄️':''}</strong></div>`).join(""):'<div class="worldEmpty">Open The Internet on LizzyOS once so the market can sync here.</div>';
- const ps=snapshot?.purchases||[];
- status.textContent=snapshot?.at?`● Synced ${new Date(snapshot.at).toLocaleString()} · Spendable ${Number(snapshot.cash||0).toFixed(2).replace(/\.00$/,'')} MB`:'○ Waiting for LizzyOS to sync';
+ const all=snapshot?.purchases||[];
+ const ps=all.filter(p=>p.status!=="ready"&&!fulfilledIds.has(p.id));
+ status.textContent=lastDeliveryMsg|| (snapshot?.at?`● Synced ${new Date(snapshot.at).toLocaleString()} · Spendable ${Number(snapshot.cash||0).toFixed(2).replace(/\.00$/,'')} MB`:'○ Waiting for LizzyOS to sync');
  purchases.innerHTML=ps.length?ps.slice().reverse().map(p=>{
   const selected=selectedFiles.get(p.id),accept=acceptFor(p),chooser=chooserFor(p);
   return `<article class="worldPurchase">
@@ -94,8 +99,10 @@ async function deliver(id){
   if(result)result.textContent=`Uploading ${file.name}…`;
   await api('world_media_put',{purchaseId:id,media:{data:media,mediaType:isAudio?'audio':'video',mime:normalizedMime,name:file.name,size:file.size}});
   selectedFiles.delete(id);
-  if(result)result.textContent='✅ Uploaded successfully. It will appear in Lizzy’s Entertainment folder when her Internet syncs.';
-  setTimeout(load,2500);
+  fulfilledIds.add(id);saveFulfilled();
+  lastDeliveryMsg=`✅ ${p.title} sent to Lizzy. Request removed from HQ.`;
+  render();
+  setTimeout(()=>{lastDeliveryMsg='';load()},2500);
  }catch(e){if(result)result.textContent='❌ '+e.message}
 }
 
