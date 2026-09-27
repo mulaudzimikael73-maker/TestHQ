@@ -411,6 +411,7 @@ export default{async fetch(req,env){
    if(u.searchParams.get("action")==="lizzy_messages"){const messages=await hqMessages(env);return json({success:true,messages:messages.filter(x=>x.status!=="handled").slice(-50)});}
    if(u.searchParams.get("action")==="mg_queue"){const commands=await arrKV(env,"mg:queue:v1");return json({success:true,commands});}
    if(u.searchParams.get("action")==="world_queue"){const commands=await arrKV(env,"world:queue:v1");return json({success:true,commands});}
+   if(u.searchParams.get("action")==="life_queue"){const commands=await arrKV(env,"life:queue:v1");return json({success:true,commands});}
    if(u.searchParams.get("action")==="annoy_state"){
      const pending=await getAnnoyPending(env);
      const cooldown=await getAnnoyCooldown(env);
@@ -826,6 +827,35 @@ if((b.action||b.type)==="world_media_get"){
 }
 if((b.action||b.type)==="world_media_delete"){
   const mediaId=S(b.mediaId,180);if(mediaId)await testKV(env).delete(`world:media:${mediaId}`);return json({success:true});
+}
+
+
+/* ---- Lizzy Life: virtual-time simulation bridge ---- */
+if((b.action||b.type)==="life_hq_push"){
+  if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
+  const c=b.command||{};
+  const allowed=["life_invite","loan_decision","legal_decision","recruitment","life_message"];
+  if(!allowed.includes(String(c.kind||"")))return json({success:false,error:"Unknown Life command"},400);
+  const q=await arrKV(env,"life:queue:v1");
+  q.push({...c,id:c.id||crypto.randomUUID(),createdAt:new Date().toISOString()});
+  await testKV(env).put("life:queue:v1",JSON.stringify(q.slice(-100)));
+  return json({success:true});
+}
+if((b.action||b.type)==="life_ack"){
+  const ids=Array.isArray(b.ids)?b.ids:[];
+  const q=(await arrKV(env,"life:queue:v1")).filter(c=>!ids.includes(c.id));
+  await testKV(env).put("life:queue:v1",JSON.stringify(q));
+  return json({success:true});
+}
+if((b.action||b.type)==="life_snapshot_put"){
+  const raw=JSON.stringify(b.snapshot||{});
+  if(raw.length>350000)return json({success:false,error:"Life snapshot too large"},400);
+  await testKV(env).put("life:snapshot:v1",raw);
+  return json({success:true});
+}
+if((b.action||b.type)==="life_snapshot_get"){
+  if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
+  return json({success:true,snapshot:await testKV(env).get("life:snapshot:v1",{type:"json"})});
 }
 
 if((b.action||b.type)==="annoy_trigger"){

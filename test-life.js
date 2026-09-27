@@ -1,0 +1,43 @@
+(()=>{
+"use strict";
+const $=id=>document.getElementById(id),api=(...a)=>window.MikaelHQApi(...a),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+let snap=null,timer=null;
+function lifeMinuteFromClock(v){const [h,m]=String(v||"19:00").split(":").map(Number);return Math.max(0,Math.min(1439,(h||0)*60+(m||0)))}
+function badge(status){const s=String(status||"");return `<span class="lifeHQBadge ${esc(s)}">${esc(s.toUpperCase())}</span>`}
+function render(){
+ const root=$("lifeHQBody"),status=$("lifeHQStatus");if(!root)return;
+ if(!snap){root.innerHTML='<div class="card">Open Lizzy Life on the TEST site once so it can sync here.</div>';return}
+ status.textContent=`● ${snap.date||"Life synced"}`;
+ const loans=(snap.loans||[]).filter(x=>x.status==="pending");
+ const legal=(snap.legal||[]).filter(x=>x.status==="requested");
+ const rel=snap.relationship?.mikael||{};
+ root.innerHTML=`
+ <div class="lifeHQTop">
+   <div class="card"><small>LIZZY'S LIFE</small><h2>${esc(snap.date||"—")}</h2><p><b>${Math.round(Number(snap.cash)||0)} LB</b> · ${snap.paused?"⏸ Paused":snap.speed==="fast"?"▶▶ Fast":"▶ Normal"}</p><div class="lifeHQNoReal">No offline catch-up. HQ shows only the saved Life clock.</div></div>
+   <div class="card"><h3>❤️ Relationship</h3><div class="lifeHQStats"><span>Trust <b>${rel.trust??0}</b></span><span>Friendship <b>${rel.friendship??0}</b></span><span>Annoyance <b>${rel.annoyance??0}</b></span></div><p>Status: <b>${esc(rel.status||"Friends")}</b></p></div>
+   <div class="card"><h3>💼 Current Life</h3><p>${snap.job?.employed?`${esc(snap.job.name)} · ${snap.job.salary} LB/day`:`Unemployed`}</p><p>${esc(snap.home?.name||"No home")} · ${snap.home?.owned?"Owned":`${snap.home?.rent||0} LB/month`}</p><p>${esc(snap.diet?.name||"—")} diet · ${snap.diet?.cost||0} LB/14 days</p></div>
+ </div>
+ <div class="lifeHQGrid">
+   <section class="card"><h3>💌 President Mikael Interaction</h3><p class="meta">Send a protected invitation. Lizzy must accept/reject it; Life skipping cannot silently answer for her.</p><label>Plan</label><select id="lifeHQPlan"><option>Shopping with Mikael</option><option>Dinner with Mikael</option><option>Bowling with Mikael</option><option>Presidential State Picnic</option><option>Emergency Chocolate Summit</option><option>Highly Suspicious Date</option></select><div class="lifeHQRow"><div><label>Life days from now</label><input id="lifeHQDays" type="number" min="1" max="365" value="2"></div><div><label>Life time</label><input id="lifeHQTime" type="time" value="19:00"></div></div><textarea id="lifeHQDetail" placeholder="Optional message from President Mikael…"></textarea><button class="primary" id="lifeHQInvite">Send Invitation</button><div id="lifeHQInviteResult" class="meta"></div></section>
+   <section class="card"><h3>🏛️ Recruitment</h3><p class="meta">Recruitment waits in Lizzy's protected decisions. Her Life clock can keep moving.</p><input id="lifeHQRecruitTitle" value="Office of President Mikael — Recruitment"><textarea id="lifeHQRecruitDetail">President Mikael would like to discuss a deeply important government role of questionable definition.</textarea><button class="primary" id="lifeHQRecruit">Send Recruitment</button><div id="lifeHQRecruitResult" class="meta"></div></section>
+ </div>
+ <div class="lifeHQGrid">
+   <section class="card"><h3>🏦 Bank of Micky — Pending Loans</h3>${loans.length?loans.map(l=>`<article class="lifeHQRequest"><div><b>${Math.round(l.amount)} LB</b> · ${esc(l.purpose||"Loan")}</div>${badge(l.status)}<p>Requested at ${esc(l.requestedLifeMinute!=null?`Life minute ${l.requestedLifeMinute}`:"Life Time")}</p><div class="lifeHQRow"><input data-life-payment="${esc(l.id)}" type="number" min="1" value="${Math.max(1,Math.ceil(Number(l.amount||0)/6))}"><button data-life-loan="approve" data-id="${esc(l.id)}">✅ Approve</button><button data-life-loan="reject" data-id="${esc(l.id)}" class="danger">❌ Reject</button></div></article>`).join(""):'<div class="lifeHQEmpty">No loan applications waiting.</div>'}</section>
+   <section class="card"><h3>⚖️ Mikael Spector — Legal Requests</h3>${legal.length?legal.map(l=>`<article class="lifeHQRequest"><div><b>${esc(l.reason||"Case")}</b></div>${badge(l.status)}<label>Terms</label><select data-legal-terms="${esc(l.id)}"><option value="retainer">Retainer</option><option value="fixed">Fixed legal fee</option><option value="percentage">Settlement percentage</option><option value="combination">Combination</option><option value="probono">Pro bono</option></select><input data-legal-value="${esc(l.id)}" placeholder="Amount / % / terms" value="100"><div class="lifeHQRow"><button data-life-legal="accept" data-id="${esc(l.id)}">⚖️ Take Case</button><button data-life-legal="reject" data-id="${esc(l.id)}" class="danger">Reject</button></div></article>`).join(""):'<div class="lifeHQEmpty">No legal representation requests waiting.</div>'}</section>
+ </div>
+ <div class="lifeHQGrid">
+   <section class="card"><h3>📅 Scheduled Plans</h3>${(snap.plans||[]).slice().reverse().slice(0,10).map(p=>`<div class="lifeHQLine"><b>${esc(p.title)}</b><span>${esc(p.status)}</span></div>`).join("")||'<div class="lifeHQEmpty">No plans yet.</div>'}</section>
+   <section class="card"><h3>📰 Recent Life Activity</h3>${(snap.activity||[]).slice().reverse().slice(0,12).map(a=>`<div class="lifeHQLine"><b>${esc(a.icon||"•")} Day ${(a.day??0)+1}</b><span>${esc(a.text)}</span></div>`).join("")||'<div class="lifeHQEmpty">Nothing yet.</div>'}</section>
+ </div>`;
+ bind();
+}
+function bind(){
+ $("lifeHQInvite")?.addEventListener("click",async()=>{const r=$("lifeHQInviteResult");try{await api("life_hq_push",{command:{kind:"life_invite",title:$("lifeHQPlan").value,detail:$("lifeHQDetail").value.trim(),daysAhead:Math.max(1,Number($("lifeHQDays").value)||1),timeMinute:lifeMinuteFromClock($("lifeHQTime").value)}});r.textContent="✅ Invitation queued for Lizzy Life."}catch(e){r.textContent="❌ "+e.message}});
+ $("lifeHQRecruit")?.addEventListener("click",async()=>{const r=$("lifeHQRecruitResult");try{await api("life_hq_push",{command:{kind:"recruitment",title:$("lifeHQRecruitTitle").value,detail:$("lifeHQRecruitDetail").value}});r.textContent="✅ Recruitment queued."}catch(e){r.textContent="❌ "+e.message}});
+ document.querySelectorAll("[data-life-loan]").forEach(b=>b.onclick=async()=>{const id=b.dataset.id,decision=b.dataset.lifeLoan,payment=Number(document.querySelector(`[data-life-payment="${CSS.escape(id)}"]`)?.value)||0;try{await api("life_hq_push",{command:{kind:"loan_decision",requestId:id,decision,payment}});b.textContent="Queued ✓"}catch(e){alert(e.message)}});
+ document.querySelectorAll("[data-life-legal]").forEach(b=>b.onclick=async()=>{const id=b.dataset.id,decision=b.dataset.lifeLegal,type=document.querySelector(`[data-legal-terms="${CSS.escape(id)}"]`)?.value,value=document.querySelector(`[data-legal-value="${CSS.escape(id)}"]`)?.value;try{await api("life_hq_push",{command:{kind:"legal_decision",requestId:id,decision,terms:{type,value}}});b.textContent="Queued ✓"}catch(e){alert(e.message)}});
+}
+async function load(){if(!window.MikaelHQApi)return;try{const d=await api("life_snapshot_get");snap=d.snapshot||null;render()}catch(e){if($("lifeHQStatus"))$("lifeHQStatus").textContent=e.message}}
+function start(){load();clearInterval(timer);timer=setInterval(()=>{if(!$("life")?.classList.contains("hidden"))load()},5000)}
+$("lifeHQRefresh")?.addEventListener("click",load);document.querySelector('[data-view="life"]')?.addEventListener("click",start);window.MikaelLifeHQ={load,start};
+})();
