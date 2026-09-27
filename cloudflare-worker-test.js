@@ -837,9 +837,10 @@ if((b.action||b.type)==="life_hq_push"){
   const allowed=["life_invite","loan_decision","legal_decision","recruitment","life_message","contract_offer","hiring_decision","employment_action","court_verdict"];
   if(!allowed.includes(String(c.kind||"")))return json({success:false,error:"Unknown Life command"},400);
   const q=await arrKV(env,"life:queue:v1");
-  q.push({...c,id:c.id||crypto.randomUUID(),createdAt:new Date().toISOString()});
+  const queued={...c,id:c.id||crypto.randomUUID(),createdAt:new Date().toISOString()};
+  q.push(queued);
   await testKV(env).put("life:queue:v1",JSON.stringify(q.slice(-100)));
-  return json({success:true});
+  return json({success:true,command:queued});
 }
 if((b.action||b.type)==="life_ack"){
   const ids=Array.isArray(b.ids)?b.ids:[];
