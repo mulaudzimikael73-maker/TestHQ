@@ -834,7 +834,7 @@ if((b.action||b.type)==="world_media_delete"){
 if((b.action||b.type)==="life_hq_push"){
   if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
   const c=b.command||{};
-  const allowed=["life_invite","loan_decision","legal_decision","recruitment","life_message","contract_offer","hiring_decision"];
+  const allowed=["life_invite","loan_decision","legal_decision","recruitment","life_message","contract_offer","hiring_decision","employment_action","court_verdict"];
   if(!allowed.includes(String(c.kind||"")))return json({success:false,error:"Unknown Life command"},400);
   const q=await arrKV(env,"life:queue:v1");
   q.push({...c,id:c.id||crypto.randomUUID(),createdAt:new Date().toISOString()});

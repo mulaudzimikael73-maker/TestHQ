@@ -91,3 +91,13 @@ body{padding-top:34px}.login-card input[type=url]{width:100%;box-sizing:border-b
 
 /* ===== LIZZY LIFE: INTERVIEW + CONTRACT TEST UI ===== */
 .lifeHQInterview{margin:12px 0;padding:14px;border:1px solid #ffffff18;border-radius:16px;background:#17121c}.lifeHQInterviewHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.lifeHQInterviewHead b,.lifeHQInterviewHead span{display:block}.lifeHQInterviewHead span{font-size:11px;opacity:.65;margin-top:3px}.lifeHQAnswers{display:grid;gap:8px;margin:10px 0}.lifeHQAnswer{padding:10px;border-radius:12px;background:#ffffff08}.lifeHQAnswer b{display:block;font-size:11px;line-height:1.4;color:#ffd6ec}.lifeHQAnswer p{margin:6px 0 0;white-space:pre-wrap;line-height:1.5;font-size:12px}.lifeHQContractState{margin:10px 0;padding:10px;border-radius:12px;background:#f08ac115;font-size:12px}.lifeHQContractForm{margin-top:10px;padding-top:10px;border-top:1px solid #ffffff12}.lifeHQContractForm label{display:block;font-size:10px;font-weight:800;opacity:.7;margin-top:6px}.lifeHQContractForm input,.lifeHQContractForm textarea{width:100%;box-sizing:border-box;margin:5px 0 8px;padding:10px;border-radius:10px;border:1px solid #ffffff18;background:#0003;color:#fff}.lifeHQContractForm textarea{min-height:70px}.lifeHQInterview h4{margin:10px 0 4px}
+
+/* ===== Lizzy Life v6: stable HQ + court ===== */
+.lifeHQCourt{padding:14px;margin:12px 0;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.035)}
+.courtScore{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
+.courtScore span{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06)}
+.courtMoves{flex-wrap:wrap}
+.courtTranscript{max-height:260px;overflow:auto;margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.16)}
+.courtTranscript p{margin:7px 0;line-height:1.4}
+.lifeHQCourt button:disabled{opacity:.45;cursor:not-allowed}
+#life input,#life textarea,#life select{scroll-margin-top:100px}
