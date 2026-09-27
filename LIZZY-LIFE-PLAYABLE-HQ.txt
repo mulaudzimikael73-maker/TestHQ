@@ -1,0 +1,9 @@
+TESTHQ — PLAYABLE LIFE COMPANION UPDATE
+
+Upload to TestHQ:
+- index.html
+- test-life.js
+
+Adds current Life location and Energy/Fun/Confidence to HQ.
+Preserves President Mikael recruitment, Michael Scott/The Office recruitment, Bank of Micky and Mikael Spector controls.
+No Cloudflare Worker change required for this update.
