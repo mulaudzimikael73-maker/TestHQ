@@ -1,3 +1,6 @@
+html,body{width:100%;min-height:100%;overflow-x:hidden;}
+body{overflow-y:auto!important;}
+.backBtn{display:inline-flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);color:#fff;text-decoration:none;font-weight:700;position:sticky;top:10px;z-index:50;backdrop-filter:blur(12px)}
 :root{
   --bg:#0a0b12;
   --panel:rgba(18,22,38,.82);
@@ -12,7 +15,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:radial-gradient(circle at top,#22284f 0%,#0a0b12 48%,#05060a 100%);color:var(--text);min-height:100vh}
-.heistShell{max-width:1400px;margin:0 auto;padding:18px}
+.heistShell{width:min(1400px,100%);margin:0 auto;padding:18px;min-height:100vh}
 .heistHero{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;background:linear-gradient(135deg,rgba(36,42,70,.95),rgba(16,19,32,.95));border:1px solid var(--line);border-radius:22px;padding:20px 22px;box-shadow:0 18px 40px rgba(0,0,0,.28)}
 .eyebrow{letter-spacing:.2em;text-transform:uppercase;font-size:12px;color:var(--gold);margin-bottom:6px}
 .heistHero h1{margin:0;font-size:34px}
