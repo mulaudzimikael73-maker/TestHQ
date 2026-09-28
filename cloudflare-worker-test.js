@@ -4,7 +4,7 @@
  * Secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
  * Telegram webhook: /telegram
  */
-const H={"content-type":"application/json","access-control-allow-origin":"*","access-control-allow-headers":"Content-Type","access-control-allow-methods":"GET,POST,OPTIONS"};
+const H={"content-type":"application/json","access-control-allow-origin":"*","access-control-allow-headers":"Content-Type,X-Mikael-HQ-Key","access-control-allow-methods":"GET,POST,OPTIONS","access-control-max-age":"86400"};
 const json=(x,s=200)=>new Response(JSON.stringify(x),{status:s,headers:H});
 
 /* TEST LAB ISOLATION
@@ -21,6 +21,16 @@ function testKV(env){
     delete:(k,...a)=>kv.delete(TEST_KV_PREFIX+k,...a)
   };
 }
+
+/* ===== LOW-KV SNAPSHOT LAYER =====
+   Snapshot clients poll often, but unchanged state must not burn a KV write.
+   Warm isolates skip duplicates without touching KV. Cold isolates do one KV read,
+   compare meaningful state (ignoring top-level `at`), and only write when changed. */
+const SNAPSHOT_HASHES=globalThis.__MICKY_TEST_SNAPSHOT_HASHES||(globalThis.__MICKY_TEST_SNAPSHOT_HASHES=new Map());
+function fastHash(v){const raw=typeof v==="string"?v:JSON.stringify(v);let h=2166136261;for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
+function meaningfulSnapshot(x){if(!x||typeof x!=="object"||Array.isArray(x))return x;const y={...x};delete y.at;return y}
+async function putSnapshotIfChanged(env,key,snapshot,maxLength){const raw=JSON.stringify(snapshot||{});if(raw.length>maxLength)throw new Error("Snapshot too large");const hash=fastHash(meaningfulSnapshot(snapshot||{}));if(SNAPSHOT_HASHES.get(key)===hash)return{stored:false,unchanged:true,hash};const kv=testKV(env);const previousRaw=await kv.get(key);if(previousRaw){try{const previous=JSON.parse(previousRaw),previousHash=fastHash(meaningfulSnapshot(previous));SNAPSHOT_HASHES.set(key,previousHash);if(previousHash===hash)return{stored:false,unchanged:true,hash}}catch{}}await kv.put(key,raw);SNAPSHOT_HASHES.set(key,hash);return{stored:true,unchanged:false,hash}}
+
 async function tg(env,m,p){const r=await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${m}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(p)});return r.json();}
 async function getClaim(env,id){return testKV(env).get(`claim:${id}`,{type:"json"})||testKV(env).get(id,{type:"json"});}
 async function putClaim(env,c){await testKV(env).put(`claim:${c.claimId}`,JSON.stringify(c));}
@@ -403,6 +413,7 @@ async function getAnnoyCooldown(env){
 }
 
 export default{async fetch(req,env){
+ try{
  if(req.method==="OPTIONS")return json({ok:true});
  const u=new URL(req.url);
 
@@ -767,15 +778,12 @@ if((b.action||b.type)==="mg_hq_push"){
   return json({success:true});
 }
 if((b.action||b.type)==="mg_ack"){
-  const ids=Array.isArray(b.ids)?b.ids:[];
-  const q=(await arrKV(env,"mg:queue:v1")).filter(c=>!ids.includes(c.id));
-  await testKV(env).put("mg:queue:v1",JSON.stringify(q));
-  return json({success:true});
+  const ids=Array.isArray(b.ids)?b.ids:[],before=await arrKV(env,"mg:queue:v1"),q=before.filter(c=>!ids.includes(c.id));
+  if(q.length!==before.length)await testKV(env).put("mg:queue:v1",JSON.stringify(q));
+  return json({success:true,removed:before.length-q.length});
 }
 if((b.action||b.type)==="mg_snapshot_put"){
-  if(JSON.stringify(b.snapshot||{}).length>200000)return json({success:false,error:"Too large"},400);
-  await testKV(env).put("mg:snapshot:v1",JSON.stringify(b.snapshot||{}));
-  return json({success:true});
+  try{const r=await putSnapshotIfChanged(env,"mg:snapshot:v1",b.snapshot||{},200000);return json({success:true,...r})}catch(e){return json({success:false,error:String(e?.message||e)},e?.message==="Snapshot too large"?400:503)}
 }
 if((b.action||b.type)==="mg_snapshot_get"){
   if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
@@ -794,14 +802,12 @@ if((b.action||b.type)==="world_hq_push"){
   return json({success:true});
 }
 if((b.action||b.type)==="world_ack"){
-  const ids=Array.isArray(b.ids)?b.ids:[];
-  const q=(await arrKV(env,"world:queue:v1")).filter(c=>!ids.includes(c.id));
-  await testKV(env).put("world:queue:v1",JSON.stringify(q));
-  return json({success:true});
+  const ids=Array.isArray(b.ids)?b.ids:[],before=await arrKV(env,"world:queue:v1"),q=before.filter(c=>!ids.includes(c.id));
+  if(q.length!==before.length)await testKV(env).put("world:queue:v1",JSON.stringify(q));
+  return json({success:true,removed:before.length-q.length});
 }
 if((b.action||b.type)==="world_snapshot_put"){
-  const raw=JSON.stringify(b.snapshot||{});if(raw.length>350000)return json({success:false,error:"Snapshot too large"},400);
-  await testKV(env).put("world:snapshot:v1",raw);return json({success:true});
+  try{const r=await putSnapshotIfChanged(env,"world:snapshot:v1",b.snapshot||{},350000);return json({success:true,...r})}catch(e){return json({success:false,error:String(e?.message||e)},e?.message==="Snapshot too large"?400:503)}
 }
 if((b.action||b.type)==="world_snapshot_get"){
   if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
@@ -838,21 +844,18 @@ if((b.action||b.type)==="life_hq_push"){
   if(!allowed.includes(String(c.kind||"")))return json({success:false,error:"Unknown Life command"},400);
   const q=await arrKV(env,"life:queue:v1");
   const queued={...c,id:c.id||crypto.randomUUID(),createdAt:new Date().toISOString()};
+  const existing=q.find(x=>x.id===queued.id);if(existing)return json({success:true,command:existing,duplicate:true});
   q.push(queued);
   await testKV(env).put("life:queue:v1",JSON.stringify(q.slice(-100)));
   return json({success:true,command:queued});
 }
 if((b.action||b.type)==="life_ack"){
-  const ids=Array.isArray(b.ids)?b.ids:[];
-  const q=(await arrKV(env,"life:queue:v1")).filter(c=>!ids.includes(c.id));
-  await testKV(env).put("life:queue:v1",JSON.stringify(q));
-  return json({success:true});
+  const ids=Array.isArray(b.ids)?b.ids:[],before=await arrKV(env,"life:queue:v1"),q=before.filter(c=>!ids.includes(c.id));
+  if(q.length!==before.length)await testKV(env).put("life:queue:v1",JSON.stringify(q));
+  return json({success:true,removed:before.length-q.length});
 }
 if((b.action||b.type)==="life_snapshot_put"){
-  const raw=JSON.stringify(b.snapshot||{});
-  if(raw.length>350000)return json({success:false,error:"Life snapshot too large"},400);
-  await testKV(env).put("life:snapshot:v1",raw);
-  return json({success:true});
+  try{const r=await putSnapshotIfChanged(env,"life:snapshot:v1",b.snapshot||{},350000);return json({success:true,...r})}catch(e){return json({success:false,error:String(e?.message||e)},e?.message==="Snapshot too large"?400:503)}
 }
 if((b.action||b.type)==="life_snapshot_get"){
   if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
@@ -1924,4 +1927,9 @@ ${title}${details?`\n\n${S(details,1800)}`:""}${extra?`\n\n${extra}`:""}`
  });
 
  return json({ok:true,type,telegram:true});
+}catch(err){
+   const msg=String(err?.message||err||"Unknown Worker error");
+   const quota=/limit|quota|rate/i.test(msg);
+   return json({success:false,error:quota?`Cloudflare KV limit/quota error: ${msg}`:`Worker error: ${msg}`},quota?429:500);
+ }
 }};

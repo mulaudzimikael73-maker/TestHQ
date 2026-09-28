@@ -80,7 +80,7 @@ async function load(){
  if(!window.MikaelHQApi)return;
  try{const d=await api('world_snapshot_get');snapshot=d.snapshot||null;render()}catch(e){if($("worldEntStatus"))$("worldEntStatus").textContent=e.message}
  clearInterval(timer);
- timer=setInterval(async()=>{if(!document.getElementById('world')?.classList.contains('hidden'))try{const d=await api('world_snapshot_get');snapshot=d.snapshot||snapshot;render()}catch{}},8000);
+ timer=setInterval(async()=>{if(!document.getElementById('world')?.classList.contains('hidden'))try{const d=await api('world_snapshot_get');snapshot=d.snapshot||snapshot;render()}catch{}},30000);
 }
 async function marketCommand(scope,action){
  const result=$("worldMarketResult"),ticker=$("worldStock")?.value,percent=Math.max(1,Math.min(80,Number($("worldPercent")?.value)||12)),headline=$("worldHeadline")?.value.trim()||"",sentiment=$("worldSentiment")?.value||"neutral";

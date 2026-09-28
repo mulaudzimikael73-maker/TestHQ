@@ -2,6 +2,10 @@
 "use strict";
 const $=id=>document.getElementById(id),api=(...a)=>window.MikaelHQApi(...a),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 let snap=null,timer=null,lastSignature="",pendingSnapshot=null;
+const LIFE_OUTBOX_KEY="testhq-life-outbox-v1";
+function loadOutbox(){try{return JSON.parse(localStorage.getItem(LIFE_OUTBOX_KEY)||"[]")||[]}catch{return[]}}
+function saveOutbox(x){try{localStorage.setItem(LIFE_OUTBOX_KEY,JSON.stringify(x.slice(-50)))}catch{}}
+function commandId(){return globalThis.crypto?.randomUUID?.()||`hq-${Date.now()}-${Math.random().toString(36).slice(2)}`}
 const COURT_KEY="mikaelLifeCourtTestV2";
 function getCourtStore(){try{return JSON.parse(localStorage.getItem(COURT_KEY)||"{}")||{}}catch{return{}}}
 function saveCourtStore(x){try{localStorage.setItem(COURT_KEY,JSON.stringify(x))}catch{}}
@@ -63,7 +67,8 @@ function render(){
  <div class="lifeHQGrid"><section class="card"><h3>👨‍👩‍👧 Family Temperature</h3>${Object.values(fam).map(p=>`<div class="lifeHQLine"><b>${esc(p.name||"Family")}</b><span>❤️ ${Math.round(p.friendship||0)} · 🤝 ${Math.round(p.trust||0)} · 😤 ${Math.round(p.annoyance||0)}</span></div>`).join("")||'<div class="lifeHQEmpty">No family data yet.</div>'}</section><section class="card"><h3>📰 Recent Life Activity</h3>${(snap.activity||[]).slice().reverse().slice(0,14).map(a=>`<div class="lifeHQLine"><b>${esc(a.icon||"•")} Day ${(a.day??0)+1}</b><span>${esc(a.text)}</span></div>`).join("")||'<div class="lifeHQEmpty">Nothing yet.</div>'}</section></div>`;
  bind();
 }
-async function send(command){return api("life_hq_push",{command})}
+async function flushOutbox(){const box=loadOutbox();if(!box.length)return 0;const keep=[];let sent=0;for(const command of box){try{await api("life_hq_push",{command});sent++}catch{keep.push(command);break}}saveOutbox([...keep,...box.slice(sent+keep.length)]);return sent}
+async function send(command){const c={...command,id:command.id||commandId()};try{const d=await api("life_hq_push",{command:c});const box=loadOutbox().filter(x=>x.id!==c.id);saveOutbox(box);return d}catch(e){const box=loadOutbox();if(!box.some(x=>x.id===c.id)){box.push(c);saveOutbox(box)}throw new Error(`${e.message} · Saved in HQ outbox for retry.`)}}
 async function afterAction(button,label="Queued ✓"){if(button)button.textContent=label;setTimeout(()=>load({force:false}),350)}
 function bind(){
  $("lifeHQInvite")?.addEventListener("click",async()=>{const r=$("lifeHQInviteResult");try{const d=await send({kind:"life_invite",title:$("lifeHQPlan").value,detail:$("lifeHQDetail").value.trim(),daysAhead:Math.max(1,Number($("lifeHQDays").value)||1),timeMinute:lifeMinuteFromClock($("lifeHQTime").value)});r.textContent=`✅ Date request queued${d?.command?.id?` · ${d.command.id}`:""}. It will appear as delivered below after Lizzy Life receives it.`}catch(e){r.textContent="❌ "+e.message}});
@@ -78,6 +83,6 @@ function bind(){
  document.querySelectorAll("[data-court-verdict]").forEach(b=>b.onclick=async()=>{const id=b.dataset.courtVerdict,c=(snap.legal||[]).find(x=>x.id===id),st=courtStateFor(c);if(!c||st.round<3||st.finished)return;const judgeRoll=Math.floor(Math.random()*4)-1,total=st.score+judgeRoll,won=total>=3,base=Math.max(100,Number(c.claimAmount)||500),award=won?Math.max(50,Math.round(base*(0.75+Math.random()*.5)/10)*10):0,judgeNote=won?"The court found that the nonsense crossed the legally tolerable threshold.":"The court found the nonsense real, but not expensive enough today.",summary=won?`Lizzy wins against ${c.defendant} and is awarded ${award} LB.`:`The claim against ${c.defendant} is dismissed.`;st.transcript.push(`JUDGE: ${judgeNote}`);st.transcript.push(`VERDICT: ${summary}`);try{await send({kind:"court_verdict",requestId:id,won,award,judgeNote,summary,transcript:st.transcript});st.finished=true;courts[id]=st;saveCourtStore(courts);b.textContent="Verdict queued to Lizzy ✓"}catch(e){alert(e.message)}});
 }
 async function load({force=false}={}){if(!window.MikaelHQApi)return;try{const d=await api("life_snapshot_get"),fresh=d.snapshot||null,sig=stableSig(fresh);if(!force&&editing()){pendingSnapshot=fresh;if($("lifeHQStatus"))$("lifeHQStatus").textContent="● New Life data checked · screen held steady while you edit";return}if(!force&&sig===lastSignature)return;snap=fresh;pendingSnapshot=null;lastSignature=sig;render()}catch(e){if($("lifeHQStatus"))$("lifeHQStatus").textContent=e.message}}
-function start(){load({force:true});clearInterval(timer);timer=setInterval(()=>{if(!$("life")?.classList.contains("hidden"))load({force:false})},15000)}
+function start(){flushOutbox().catch(()=>{});load({force:true});clearInterval(timer);timer=setInterval(()=>{if(!$("life")?.classList.contains("hidden"))load({force:false})},30000)}
 $("lifeHQRefresh")?.addEventListener("click",()=>load({force:true}));document.querySelector('[data-view="life"]')?.addEventListener("click",start);window.MikaelLifeHQ={load,start};
 })();
