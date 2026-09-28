@@ -133,19 +133,23 @@
     }
   };
 
-  const state = {data:null, busy:false, routeOrder:[]};
   const TEST_WORKER_FALLBACK='https://mickyhq-test.mulaudzimikael73.workers.dev';
+  const state = {data:null, busy:false, draft:{stage:null,path:[],choice:'',selection:[],answer:''}};
 
   function resolveWorkerUrl(){
-    const keys=['lizzyTelegramWorkerURL','testWorkerUrl','testWorkerURL','mikaelHQTestWorkerUrl','mikaelHQTestWorkerURL','mikaelTestWorkerUrl'];
-    for(const k of keys){ const v=localStorage.getItem(k); if(v && /^https?:/i.test(v)) return v; }
+    // TESTR stores its isolated Worker URL here via test-site-config.js.
+    try{
+      const testUrl=(localStorage.getItem('lizzyos_test_worker_url_v1')||'').trim();
+      if(/^https?:/i.test(testUrl)) return testUrl;
+    }catch{}
     try{
       const parentDoc = window.parent && window.parent !== window ? window.parent.document : null;
       const parentInput = parentDoc?.getElementById('testWorkerUrl');
-      if(parentInput?.value) return parentInput.value.trim();
+      if(parentInput?.value && /^https?:/i.test(parentInput.value.trim())) return parentInput.value.trim();
     }catch{}
-    if(window.TEST_WORKER_URL) return window.TEST_WORKER_URL;
-    if(window.LIZZY_TELEGRAM_WORKER_URL) return window.LIZZY_TELEGRAM_WORKER_URL;
+    if(window.TEST_WORKER_URL && /^https?:/i.test(window.TEST_WORKER_URL)) return window.TEST_WORKER_URL;
+    if(window.LIZZY_TEST_MODE && window.LIZZY_TELEGRAM_WORKER_URL && /^https?:/i.test(window.LIZZY_TELEGRAM_WORKER_URL)) return window.LIZZY_TELEGRAM_WORKER_URL;
+    // Final TEST-only fallback. Never use the production lizzyos-notifications Worker here.
     return TEST_WORKER_FALLBACK;
   }
   function resolveHQKey(){
@@ -172,10 +176,17 @@
   async function apiGet(){
     const base = resolveWorkerUrl();
     if(!base) throw new Error('No test worker URL found.');
-    const res = await fetch(`${base}${base.includes('?')?'&':'?'}action=heist_state`,{headers: role==='mikael'&&resolveHQKey()?{'X-Mikael-HQ-Key':resolveHQKey()}:undefined});
-    const data = await res.json().catch(()=>({success:false,error:'Invalid server response'}));
-    if(!res.ok || data.success===false) throw new Error(data.error || `Request failed (${res.status})`);
-    return data;
+    const headers = role==='mikael'&&resolveHQKey()?{'X-Mikael-HQ-Key':resolveHQKey()}:{};
+    try{
+      const res = await fetch(`${base}${base.includes('?')?'&':'?'}action=heist_state`,{headers,cache:'no-store'});
+      const data = await res.json().catch(()=>({success:false,error:'Invalid server response'}));
+      if(res.ok && data.success!==false) return data;
+    }catch{}
+    const postHeaders={'content-type':'application/json',...headers};
+    const res2=await fetch(base,{method:'POST',headers:postHeaders,body:JSON.stringify({action:'heist_state',hqKey:resolveHQKey()||undefined})});
+    const data2=await res2.json().catch(()=>({success:false,error:'Invalid server response'}));
+    if(!res2.ok || data2.success===false) throw new Error(data2.error || `Heist worker unavailable (${res2.status})`);
+    return data2;
   }
 
   function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':'&quot;'}[m]))}
@@ -200,11 +211,11 @@
     const stageState = state.data?.stages?.[stage] || {};
     if(!action) return '<p class="muted">No action on this side.</p>';
     if(action.type==='display') return `<div class="displayCard"><p>${escapeHtml(action.text)}</p></div>`;
-    if(action.type==='text') return `<div class="actionBox"><input id="answerInput" class="heistInput" placeholder="${escapeHtml(action.placeholder)}" value="${escapeHtml(stageState[role+'Draft']||'')}"><button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
-    if(action.type==='choices') return `<div class="actionBox choices">${action.choices.map(ch=>`<label class="choicePill"><input type="radio" name="boxChoice" value="${escapeHtml(ch)}" ${stageState.choice===ch?'checked':''}><span>${escapeHtml(ch)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
-    if(action.type==='checks') return `<div class="actionBox checks">${action.items.map(item=>`<label class="choicePill"><input type="checkbox" value="${escapeHtml(item.id)}" ${(stageState.selection||[]).includes(item.id)?'checked':''}><span>${escapeHtml(item.label)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+    if(action.type==='text') return `<div class="actionBox"><input id="answerInput" class="heistInput" placeholder="${escapeHtml(action.placeholder)}" value="${escapeHtml(state.draft.stage===stage ? state.draft.answer : (stageState[role+'Draft']||''))}"><button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+    if(action.type==='choices') return `<div class="actionBox choices">${action.choices.map(ch=>`<label class="choicePill"><input type="radio" name="boxChoice" value="${escapeHtml(ch)}" ${((state.draft.stage===stage?state.draft.choice:stageState.choice)===ch)?'checked':''}><span>${escapeHtml(ch)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+    if(action.type==='checks') return `<div class="actionBox checks">${action.items.map(item=>`<label class="choicePill"><input type="checkbox" value="${escapeHtml(item.id)}" ${((state.draft.stage===stage?state.draft.selection:(stageState.selection||[]))).includes(item.id)?'checked':''}><span>${escapeHtml(item.label)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
     if(action.type==='grid'){
-      const picked = stageState.path || [];
+      const picked = state.draft.stage===stage && state.draft.path.length ? state.draft.path : (stageState.path || []);
       const cols=['A','B','C','D'];
       const rows=[1,2,3];
       return `<div class="actionBox"><div class="laserGrid">${rows.map(row=>cols.map(col=>{const tile=col+row;return `<button class="tileBtn ${picked.includes(tile)?'selected':''}" data-tile="${tile}">${tile}</button>`}).join('')).join('')}</div><div class="tileMeta">Selected route: <b id="routePreview">${picked.join(' → ')||'None'}</b></div><button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
@@ -233,22 +244,20 @@
         ? '<strong>⚠ Final override armed.</strong> Lizzy can enter the escape code now.'
         : `<strong>Current stage:</strong> ${escapeHtml(stage.title)}`;
     $('#resultBox').textContent = s.completed ? (s.completionText || 'Both players escaped successfully.') : (s.lastMessage || 'Work together using your separate clues.');
+    if(state.draft.stage!==Number(s.currentStage||1)){ state.draft={stage:Number(s.currentStage||1),path:[],choice:'',selection:[],answer:''}; }
     const resetWrap = $('#hqResetWrap');
     if(resetWrap) resetWrap.style.display = role==='mikael' ? 'flex' : 'none';
 
-    if(stage[role]?.action?.type==='grid') state.routeOrder=[...(stageState.path||[])];
-    $$('.tileBtn').forEach(btn=>btn.addEventListener('click',()=>{
-      const tile=btn.dataset.tile;
-      if(btn.classList.contains('selected')){
-        btn.classList.remove('selected');
-        state.routeOrder=state.routeOrder.filter(x=>x!==tile);
-      }else{
-        btn.classList.add('selected');
-        state.routeOrder=state.routeOrder.filter(x=>x!==tile);
-        state.routeOrder.push(tile);
-      }
-      $('#routePreview').textContent = state.routeOrder.join(' → ') || 'None';
+    $$('.tileBtn').forEach(btn=>btn.addEventListener('click',(e)=>{
+      e.preventDefault();
+      btn.classList.toggle('selected');
+      state.draft.stage=Number(s.currentStage||1);
+      state.draft.path=$$('.tileBtn.selected').map(x=>x.dataset.tile);
+      $('#routePreview').textContent = state.draft.path.join(' → ') || 'None';
     }));
+    $$('input[name="boxChoice"]').forEach(el=>el.addEventListener('change',()=>{state.draft.stage=Number(s.currentStage||1);state.draft.choice=el.value;}));
+    $$('.checks input[type="checkbox"]').forEach(el=>el.addEventListener('change',()=>{state.draft.stage=Number(s.currentStage||1);state.draft.selection=$$('.checks input[type="checkbox"]:checked').map(x=>x.value);}));
+    $('#answerInput')?.addEventListener('input',e=>{state.draft.stage=Number(s.currentStage||1);state.draft.answer=e.target.value;});
     $('#submitAction')?.addEventListener('click', submitCurrentAction);
     $('#refreshBtn')?.addEventListener('click', ()=>load(true));
     $('#resetHeistBtn')?.addEventListener('click', resetHeist);
@@ -259,15 +268,17 @@
     const stage = currentStageData();
     const action = stage[role]?.action;
     let payload = {stage:stageNum, role};
-    if(action?.type==='text') payload.answer = $('#answerInput')?.value?.trim() || '';
-    if(action?.type==='grid') payload.path = [...state.routeOrder];
-    if(action?.type==='choices') payload.choice = $('input[name="boxChoice"]:checked')?.value || '';
-    if(action?.type==='checks') payload.selection = $$('input[type="checkbox"]:checked').map(x=>x.value);
+    if(action?.type==='text') payload.answer = (state.draft.answer || $('#answerInput')?.value || '').trim();
+    if(action?.type==='grid') payload.path = state.draft.path.length ? state.draft.path : $$('.tileBtn.selected').map(x=>x.dataset.tile);
+    if(action?.type==='choices') payload.choice = state.draft.choice || $('input[name="boxChoice"]:checked')?.value || '';
+    if(action?.type==='checks') payload.selection = state.draft.selection.length ? state.draft.selection : $$('.checks input[type="checkbox"]:checked').map(x=>x.value);
     if(action?.type==='arm') payload.arm = true;
     state.busy=true; $('#resultBox').textContent='Sending…';
     try{
       const res = await api('heist_submit', payload);
+      const previousStage=stageNum;
       state.data = res.state;
+      if(Number(state.data?.currentStage||1)!==Number(previousStage)) state.draft={stage:Number(state.data?.currentStage||1),path:[],choice:'',selection:[],answer:''};
       render();
       $('#resultBox').textContent = res.message || 'Move submitted.';
     }catch(err){ $('#resultBox').textContent='❌ '+err.message; }
@@ -278,7 +289,9 @@
     if(!confirm('Reset the full Bank of Micky Heist for both players?')) return;
     try{
       const res = await api('heist_reset', {role});
+      const previousStage=stageNum;
       state.data = res.state;
+      if(Number(state.data?.currentStage||1)!==Number(previousStage)) state.draft={stage:Number(state.data?.currentStage||1),path:[],choice:'',selection:[],answer:''};
       render();
       $('#resultBox').textContent='🔄 Heist reset. Both screens are back to Stage 1.';
     }catch(err){ $('#resultBox').textContent='❌ '+err.message; }
@@ -288,8 +301,14 @@
       const res = await apiGet();
       const incoming = res.state;
       if(force || JSON.stringify(incoming)!==JSON.stringify(state.data)){
+        const oldStage=Number(state.data?.currentStage||1), newStage=Number(incoming?.currentStage||1);
+        const preserveDraft = state.draft.stage===oldStage && oldStage===newStage && (state.draft.path.length||state.draft.choice||state.draft.selection.length||state.draft.answer);
         state.data = incoming;
-        render();
+        if(!preserveDraft || force || incoming?.completed) render();
+        else {
+          $('#connectionStatus').textContent='Connected to test worker';
+          $('#sharedStatus').innerHTML=`<strong>Current stage:</strong> ${escapeHtml(currentStageData().title)}`;
+        }
       }
     }catch(err){ $('#connectionStatus').textContent = 'Connection issue'; $('#resultBox').textContent='❌ '+err.message; }
   }
@@ -298,6 +317,6 @@
     $('#roleBadge').textContent = roleBadge;
     render();
     load(true);
-    setInterval(()=>load(false),5000);
+    setInterval(()=>load(false),10000);
   });
 })();
