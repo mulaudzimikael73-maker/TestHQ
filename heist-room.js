@@ -133,7 +133,8 @@
     }
   };
 
-  const state = {data:null, busy:false};
+  const state = {data:null, busy:false, routeOrder:[]};
+  const TEST_WORKER_FALLBACK='https://mickyhq-test.mulaudzimikael73.workers.dev';
 
   function resolveWorkerUrl(){
     const keys=['lizzyTelegramWorkerURL','testWorkerUrl','testWorkerURL','mikaelHQTestWorkerUrl','mikaelHQTestWorkerURL','mikaelTestWorkerUrl'];
@@ -145,7 +146,7 @@
     }catch{}
     if(window.TEST_WORKER_URL) return window.TEST_WORKER_URL;
     if(window.LIZZY_TELEGRAM_WORKER_URL) return window.LIZZY_TELEGRAM_WORKER_URL;
-    return '';
+    return TEST_WORKER_FALLBACK;
   }
   function resolveHQKey(){
     const keys=['hqKey','testHqKey','mikaelHQKey','mikaelTestHQKey'];
@@ -235,9 +236,18 @@
     const resetWrap = $('#hqResetWrap');
     if(resetWrap) resetWrap.style.display = role==='mikael' ? 'flex' : 'none';
 
+    if(stage[role]?.action?.type==='grid') state.routeOrder=[...(stageState.path||[])];
     $$('.tileBtn').forEach(btn=>btn.addEventListener('click',()=>{
-      btn.classList.toggle('selected');
-      $('#routePreview').textContent = $$('.tileBtn.selected').map(x=>x.dataset.tile).join(' → ') || 'None';
+      const tile=btn.dataset.tile;
+      if(btn.classList.contains('selected')){
+        btn.classList.remove('selected');
+        state.routeOrder=state.routeOrder.filter(x=>x!==tile);
+      }else{
+        btn.classList.add('selected');
+        state.routeOrder=state.routeOrder.filter(x=>x!==tile);
+        state.routeOrder.push(tile);
+      }
+      $('#routePreview').textContent = state.routeOrder.join(' → ') || 'None';
     }));
     $('#submitAction')?.addEventListener('click', submitCurrentAction);
     $('#refreshBtn')?.addEventListener('click', ()=>load(true));
@@ -250,7 +260,7 @@
     const action = stage[role]?.action;
     let payload = {stage:stageNum, role};
     if(action?.type==='text') payload.answer = $('#answerInput')?.value?.trim() || '';
-    if(action?.type==='grid') payload.path = $$('.tileBtn.selected').map(x=>x.dataset.tile);
+    if(action?.type==='grid') payload.path = [...state.routeOrder];
     if(action?.type==='choices') payload.choice = $('input[name="boxChoice"]:checked')?.value || '';
     if(action?.type==='checks') payload.selection = $$('input[type="checkbox"]:checked').map(x=>x.value);
     if(action?.type==='arm') payload.arm = true;
