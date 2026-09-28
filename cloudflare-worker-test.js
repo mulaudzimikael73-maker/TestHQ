@@ -412,6 +412,20 @@ async function getAnnoyCooldown(env){
   return null;
 }
 
+
+
+/* ===== 🏦 BANK OF MICKY HEIST ===== */
+const HEIST_STATE_KEY="heist:bank_of_micky:v1";
+function defaultHeistStages(){return {1:{solved:false},2:{solved:false},3:{solved:false},4:{solved:false},5:{solved:false}}}
+function defaultHeistState(){return {title:"Bank of Micky Heist",currentStage:1,completed:false,overrideArmed:false,lastMessage:"Stage 1 ready. Mikael has the symbol chart. Lizzy has the keypad.",completionText:"",logs:[{title:"Mission Online",text:"The bank is locked down. Split up and compare clues.",at:new Date().toISOString()}],stages:defaultHeistStages(),updatedAt:new Date().toISOString()};}
+function normalizeHeistState(x){const base=defaultHeistState();const s=x&&typeof x==="object"?x:{};const out={...base,...s,stages:{...base.stages,...(s.stages||{})}};out.logs=Array.isArray(out.logs)?out.logs:base.logs;return out;}
+async function getHeistState(env){const s=await testKV(env).get(HEIST_STATE_KEY,{type:"json"});return normalizeHeistState(s);}
+async function putHeistState(env,s){s.updatedAt=new Date().toISOString();await testKV(env).put(HEIST_STATE_KEY,JSON.stringify(s));return s;}
+function heistLog(state,title,text){state.logs=Array.isArray(state.logs)?state.logs:[];state.logs.push({title,text,at:new Date().toISOString()});state.logs=state.logs.slice(-30);}
+function heistAdvance(state,stage,title,text){state.stages[String(stage)]={...(state.stages[String(stage)]||{}),solved:true};heistLog(state,title,text);if(Number(stage)>=5){state.completed=true;state.currentStage=5;state.completionText="Vault breached. The two-player escape is complete. Bank of Micky is preparing a strongly worded memo.";state.lastMessage=state.completionText;}else{state.currentStage=Number(stage)+1;state.lastMessage=`Stage ${stage} cleared. Proceed to Stage ${Number(stage)+1}.`;}}
+function eqArray(a,b){return Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((x,i)=>x===b[i]);}
+function validateHeistSubmission(state,b){const stage=Number(b.stage||state.currentStage||1),role=String(b.role||"").toLowerCase();if(state.completed)return{ok:false,message:"The heist has already been completed. Reset it from HQ if you want another run."};if(stage!==Number(state.currentStage||1))return{ok:false,message:`That clue belongs to Stage ${stage}, but the shared game is on Stage ${state.currentStage}. Refresh both screens.`};switch(stage){case 1:{const ans=String(b.answer||"").replace(/\s+/g,"");if(role!=="lizzy")return{ok:false,message:"Mikael does not enter the code on this stage. Guide Lizzy instead."};if(ans==="4815"){heistAdvance(state,1,"Stage 1 Cleared","Lizzy entered the lockdown code 4815 and the first steel gate opened.");return{ok:true,message:"✅ Correct. The first gate unlocked."};}return{ok:false,message:"❌ Wrong code. Mikael should read the symbols to you again."};}case 2:{const path=(Array.isArray(b.path)?b.path:[]).map(x=>String(x));const expected=["A2","B1","C3","D2"];if(role!=="lizzy")return{ok:false,message:"Only Lizzy crosses the laser hallway on this stage."};if(eqArray(path,expected)){state.stages["2"].path=path;heistAdvance(state,2,"Stage 2 Cleared","Lizzy crossed the laser corridor without turning herself into toast.");return{ok:true,message:"✅ Perfect route. The laser corridor is clear."};}return{ok:false,message:"❌ The route was wrong. Tell Lizzy the tile order again."};}case 3:{const choice=String(b.choice||"");if(role!=="lizzy")return{ok:false,message:"Only Lizzy can open a deposit box from the room side."};if(choice==="317"){state.stages["3"].choice=choice;heistAdvance(state,3,"Stage 3 Cleared","Deposit box 317 contained the prototype key item and a worrying amount of glitter.");return{ok:true,message:"✅ Box 317 was correct."};}return{ok:false,message:"❌ Wrong box. Mikael should check the ledger again."};}case 4:{const selection=(Array.isArray(b.selection)?b.selection:[]).map(x=>String(x)).sort();const expected=["cash","diamond","gold","key","mask"].sort();if(role!=="lizzy")return{ok:false,message:"Only Lizzy can place the pressure items in the chamber."};if(eqArray(selection,expected)){state.stages["4"].selection=selection;heistAdvance(state,4,"Stage 4 Cleared","The pressure plate hit exactly 27 kg. Maths has saved the heist.");return{ok:true,message:"✅ Exact pressure reached."};}return{ok:false,message:"❌ The pressure was off. Recalculate the total weight."};}case 5:{if(role==="mikael"){if(state.overrideArmed)return{ok:true,message:"Override is already armed. Lizzy can enter the final code."};if(!b.arm)return{ok:false,message:"Arm the override first."};state.overrideArmed=true;heistLog(state,"Override Armed","Mikael armed the final override console.");state.lastMessage="Final override armed. Lizzy can enter the escape code.";return{ok:true,message:"✅ Override armed. Lizzy may enter the final code now."};}if(role!=="lizzy")return{ok:false,message:"Unknown player role."};const answer=String(b.answer||"").trim().toUpperCase();if(!state.overrideArmed)return{ok:false,message:"⚠ Mikael still needs to arm the override first."};if(answer==="Q9-AB-47"){heistAdvance(state,5,"Escape Complete","Lizzy entered Q9-AB-47 and the final vault door swung open.");return{ok:true,message:"🏆 Escape successful. You both got out."};}return{ok:false,message:"❌ Wrong final code. Combine Lizzy's fragment with Mikael's in the correct order."};}default:return{ok:false,message:"Unknown stage."};}}
+
 export default{async fetch(req,env){
  try{
  if(req.method==="OPTIONS")return json({ok:true});
@@ -423,6 +437,7 @@ export default{async fetch(req,env){
    if(u.searchParams.get("action")==="mg_queue"){const commands=await arrKV(env,"mg:queue:v1");return json({success:true,commands});}
    if(u.searchParams.get("action")==="world_queue"){const commands=await arrKV(env,"world:queue:v1");return json({success:true,commands});}
    if(u.searchParams.get("action")==="life_queue"){const commands=await arrKV(env,"life:queue:v1");return json({success:true,commands});}
+   if(u.searchParams.get("action")==="heist_state"){const state=await getHeistState(env);return json({success:true,state});}
    if(u.searchParams.get("action")==="annoy_state"){
      const pending=await getAnnoyPending(env);
      const cooldown=await getAnnoyCooldown(env);
@@ -835,6 +850,22 @@ if((b.action||b.type)==="world_media_delete"){
   const mediaId=S(b.mediaId,180);if(mediaId)await testKV(env).delete(`world:media:${mediaId}`);return json({success:true});
 }
 
+
+
+/* ---- Our World: Bank of Micky Heist ---- */
+if((b.action||b.type)==="heist_submit"){
+  const state=await getHeistState(env);
+  const result=validateHeistSubmission(state,b||{});
+  if(!result.ok)return json({success:false,error:result.message,state},400);
+  await putHeistState(env,state);
+  return json({success:true,message:result.message,state});
+}
+if((b.action||b.type)==="heist_reset"){
+  if(!hqOnly(req,env,b))return json({success:false,error:"Unauthorized"},401);
+  const state=defaultHeistState();
+  await putHeistState(env,state);
+  return json({success:true,state});
+}
 
 /* ---- Lizzy Life: virtual-time simulation bridge ---- */
 if((b.action||b.type)==="life_hq_push"){

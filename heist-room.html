@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bank of Micky Heist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="heist-room.css?v=20260928-heist1">
+</head>
+<body>
+  <div class="heistShell">
+    <section class="heistHero">
+      <div>
+        <div class="eyebrow">Our World • Co-op Escape Room</div>
+        <h1>🏦 Bank of Micky Heist</h1>
+        <p>A two-player cinematic escape room for the TEST build. You and Lizzy see different clues, so the only way out is by working together on the call.</p>
+      </div>
+      <aside class="roleCard">
+        <div id="roleBadge" class="miniBadge">ROLE</div>
+        <b id="roleName">Loading role…</b>
+        <div class="statusLine" id="connectionStatus">Checking connection…</div>
+        <div class="hqResetWrap" id="hqResetWrap" style="display:none">
+          <button class="secondaryBtn" id="refreshBtn" type="button">↻ Refresh</button>
+          <button class="primaryBtn" id="resetHeistBtn" type="button">Reset Heist</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="heistGrid">
+      <div class="leftCol">
+        <article class="card">
+          <h2 id="stageTitle">Stage</h2>
+          <p class="stageSummary" id="stageSummary"></p>
+        </article>
+
+        <article class="card">
+          <h3 id="roomTitle">Room</h3>
+          <div class="visualBox">
+            <div class="visualLabel">Visual Scene</div>
+            <div class="visualText" id="roomVisual"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>🔎 Clues Only You Can See</h3>
+          <ul class="clueList" id="clueList"></ul>
+        </article>
+
+        <article class="card">
+          <h3>🎛 Your Action</h3>
+          <div id="actionPanel"></div>
+        </article>
+      </div>
+
+      <div class="rightCol">
+        <article class="card">
+          <h3>📍 Shared Progress</h3>
+          <div class="progressDots" id="progressDots"></div>
+          <div class="resultBox" id="sharedStatus"></div>
+        </article>
+
+        <article class="card">
+          <h3>🗂 Mission Feed</h3>
+          <ul class="logList" id="logList"></ul>
+        </article>
+
+        <article class="card">
+          <h3>🎬 Results</h3>
+          <div class="resultBox" id="resultBox">Waiting for the first move…</div>
+          <p class="muted">Funny + serious rule: act professional, but don’t be alarmed if the bank paperwork is a bit ridiculous.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+  <script src="heist-room.js?v=20260928-heist1"></script>
+</body>
+</html>
