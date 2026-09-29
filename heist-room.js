@@ -133,12 +133,10 @@
     }
   };
 
-  const state = {data:null, busy:false};
-  const localDraft = {path:[], selection:[]};
-  const routeOrder = ['A','B','C','D'];
+  const state = {data:null, busy:false, drafts:{}};
 
   function resolveWorkerUrl(){
-    const keys=['lizzyos_test_worker_url_v1','lizzyTelegramWorkerURL','testWorkerUrl','testWorkerURL','mikaelHQTestWorkerUrl','mikaelHQTestWorkerURL','mikaelTestWorkerUrl'];
+    const keys=['lizzyTelegramWorkerURL','testWorkerUrl','testWorkerURL','mikaelHQTestWorkerUrl','mikaelHQTestWorkerURL','mikaelTestWorkerUrl'];
     for(const k of keys){ const v=localStorage.getItem(k); if(v && /^https?:/i.test(v)) return v; }
     try{
       const parentDoc = window.parent && window.parent !== window ? window.parent.document : null;
@@ -201,20 +199,17 @@
     const stageState = state.data?.stages?.[stage] || {};
     if(!action) return '<p class="muted">No action on this side.</p>';
     if(action.type==='display') return `<div class="displayCard"><p>${escapeHtml(action.text)}</p></div>`;
-    if(action.type==='text') return `<div class="actionBox"><input id="answerInput" class="heistInput" placeholder="${escapeHtml(action.placeholder)}" value="${escapeHtml(stageState[role+'Draft']||'')}"><button id="submitAction" type="button" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
-    if(action.type==='choices') return `<div class="actionBox choices">${action.choices.map(ch=>`<label class="choicePill"><input type="radio" name="boxChoice" value="${escapeHtml(ch)}" ${stageState.choice===ch?'checked':''}><span>${escapeHtml(ch)}</span></label>`).join('')}<button id="submitAction" type="button" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
-    if(action.type==='checks') {
-      const selected = localDraft.selection.length ? localDraft.selection : (stageState.selection || []);
-      return `<div class="actionBox checks">${action.items.map(item=>`<label class="choicePill"><input type="checkbox" data-heist-item="${escapeHtml(item.id)}" value="${escapeHtml(item.id)}" ${selected.includes(item.id)?'checked':''}><span>${escapeHtml(item.label)}</span></label>`).join('')}<button id="submitAction" type="button" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
-    }
+    if(action.type==='text') return `<div class="actionBox"><input id="answerInput" class="heistInput" placeholder="${escapeHtml(action.placeholder)}" value="${escapeHtml(stageState[role+'Draft']||'')}"><button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+    if(action.type==='choices') return `<div class="actionBox choices">${action.choices.map(ch=>`<label class="choicePill"><input type="radio" name="boxChoice" value="${escapeHtml(ch)}" ${stageState.choice===ch?'checked':''}><span>${escapeHtml(ch)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+    if(action.type==='checks') return `<div class="actionBox checks">${action.items.map(item=>`<label class="choicePill"><input type="checkbox" value="${escapeHtml(item.id)}" ${(stageState.selection||[]).includes(item.id)?'checked':''}><span>${escapeHtml(item.label)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
     if(action.type==='grid'){
-      const picked = localDraft.path.length ? localDraft.path : (stageState.path || []);
+      const draftKey = `stage${stage}:path`;
+      const picked = state.drafts[draftKey] || stageState.path || [];
       const cols=['A','B','C','D'];
       const rows=[1,2,3];
-      const ordered = [...picked].sort((a,b)=>routeOrder.indexOf(a[0])-routeOrder.indexOf(b[0]));
-      return `<div class="actionBox"><div class="laserGrid">${rows.map(row=>cols.map(col=>{const tile=col+row;return `<button type="button" class="tileBtn ${picked.includes(tile)?'selected':''}" data-tile="${tile}">${tile}</button>`}).join('')).join('')}</div><div class="tileMeta">Selected route: <b id="routePreview">${ordered.join(' → ')||'None'}</b></div><button id="submitAction" type="button" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+      return `<div class="actionBox"><div class="laserGrid">${rows.map(row=>cols.map(col=>{const tile=col+row;return `<button type="button" class="tileBtn ${picked.includes(tile)?'selected':''}" data-tile="${tile}" aria-pressed="${picked.includes(tile)?'true':'false'}">${tile}</button>`}).join('')).join('')}</div><div class="tileMeta">Selected route: <b id="routePreview">${picked.join(' → ')||'None'}</b></div><button type="button" id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
     }
-    if(action.type==='arm') return `<div class="actionBox"><button id="submitAction" type="button" class="primaryBtn">${escapeHtml(action.button)}</button><p class="muted">This enables Lizzy’s final keypad.</p></div>`;
+    if(action.type==='arm') return `<div class="actionBox"><button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button><p class="muted">This enables Lizzy’s final keypad.</p></div>`;
     return '<p class="muted">No action.</p>';
   }
   function render(){
@@ -241,18 +236,6 @@
     const resetWrap = $('#hqResetWrap');
     if(resetWrap) resetWrap.style.display = role==='mikael' ? 'flex' : 'none';
 
-    $$('.tileBtn').forEach(btn=>btn.addEventListener('click',()=>{
-      const tile=btn.dataset.tile;
-      const col=tile[0];
-      localDraft.path = localDraft.path.filter(x=>x[0]!==col);
-      localDraft.path.push(tile);
-      localDraft.path.sort((a,b)=>routeOrder.indexOf(a[0])-routeOrder.indexOf(b[0]));
-      $$('.tileBtn').forEach(x=>x.classList.toggle('selected',localDraft.path.includes(x.dataset.tile)));
-      $('#routePreview').textContent = localDraft.path.join(' → ') || 'None';
-    }));
-    $$('[data-heist-item]').forEach(cb=>cb.addEventListener('change',()=>{
-      localDraft.selection = $$('[data-heist-item]:checked').map(x=>x.value);
-    }));
     $('#submitAction')?.addEventListener('click', submitCurrentAction);
     $('#refreshBtn')?.addEventListener('click', ()=>load(true));
     $('#resetHeistBtn')?.addEventListener('click', resetHeist);
@@ -264,16 +247,15 @@
     const action = stage[role]?.action;
     let payload = {stage:stageNum, role};
     if(action?.type==='text') payload.answer = $('#answerInput')?.value?.trim() || '';
-    if(action?.type==='grid') payload.path = [...localDraft.path].sort((a,b)=>routeOrder.indexOf(a[0])-routeOrder.indexOf(b[0]));
+    if(action?.type==='grid') payload.path = state.drafts[`stage${stageNum}:path`] || $$('.tileBtn.selected').map(x=>x.dataset.tile);
     if(action?.type==='choices') payload.choice = $('input[name="boxChoice"]:checked')?.value || '';
-    if(action?.type==='checks') payload.selection = localDraft.selection.length ? [...localDraft.selection] : $$('[data-heist-item]:checked').map(x=>x.value);
+    if(action?.type==='checks') payload.selection = $$('input[type="checkbox"]:checked').map(x=>x.value);
     if(action?.type==='arm') payload.arm = true;
     state.busy=true; $('#resultBox').textContent='Sending…';
     try{
       const res = await api('heist_submit', payload);
-      const previousStage=stageNum;
       state.data = res.state;
-      if(Number(state.data?.currentStage)!==Number(previousStage)){ localDraft.path=[]; localDraft.selection=[]; }
+      if(action?.type==='grid') delete state.drafts[`stage${stageNum}:path`];
       render();
       $('#resultBox').textContent = res.message || 'Move submitted.';
     }catch(err){ $('#resultBox').textContent='❌ '+err.message; }
@@ -284,9 +266,8 @@
     if(!confirm('Reset the full Bank of Micky Heist for both players?')) return;
     try{
       const res = await api('heist_reset', {role});
-      const previousStage=stageNum;
       state.data = res.state;
-      if(Number(state.data?.currentStage)!==Number(previousStage)){ localDraft.path=[]; localDraft.selection=[]; }
+      if(action?.type==='grid') delete state.drafts[`stage${stageNum}:path`];
       render();
       $('#resultBox').textContent='🔄 Heist reset. Both screens are back to Stage 1.';
     }catch(err){ $('#resultBox').textContent='❌ '+err.message; }
@@ -302,10 +283,25 @@
     }catch(err){ $('#connectionStatus').textContent = 'Connection issue'; $('#resultBox').textContent='❌ '+err.message; }
   }
   document.addEventListener('DOMContentLoaded',()=>{
+    document.addEventListener('click',e=>{
+      const btn=e.target.closest?.('.tileBtn');
+      if(!btn) return;
+      e.preventDefault();
+      const stageNum=state.data?.currentStage||2;
+      const key=`stage${stageNum}:path`;
+      const current=[...(state.drafts[key]||[])];
+      const tile=btn.dataset.tile;
+      const i=current.indexOf(tile);
+      if(i>=0) current.splice(i,1); else current.push(tile);
+      state.drafts[key]=current;
+      btn.classList.toggle('selected',i<0);
+      btn.setAttribute('aria-pressed',i<0?'true':'false');
+      const preview=$('#routePreview'); if(preview) preview.textContent=current.join(' → ')||'None';
+    });
     $('#roleName').textContent = roleLabel;
     $('#roleBadge').textContent = roleBadge;
     render();
     load(true);
-    setInterval(()=>load(false),3000);
+    setInterval(()=>load(false),5000);
   });
 })();
