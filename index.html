@@ -99,12 +99,14 @@
 <section id="life" class="view hidden">
   <div class="section-intro"><div><span class="pill">VIRTUAL LIFE TEST</span><h2>🎮 Lizzy Life</h2><p>Life Time is completely separate from real-world dates. It advances only when Lizzy completes a timed activity or explicitly skips Life time. Simply leaving the game open does nothing.</p></div><div class="intro-actions"><button class="primary" id="lifeHQRefresh">↻ Refresh Lizzy Life</button></div></div>
   <div id="lifeHQStatus" class="turn">Waiting for Lizzy Life sync…</div>
-  <div id="lifeHQBody"></div></section>
+  <div id="lifeHQBody"></div>
+</section>
+
 
 <section id="heist" class="view hidden">
-  <div class="section-intro"><div><span class="pill">2 PLAYER ESCAPE ROOM</span><h2>🏦 Bank of Micky Heist</h2><p>Open your side of the heist here while Lizzy opens hers in TESTR. Both screens show different clues, so you can only escape by working together.</p></div></div>
-  <div class="card" style="padding:10px">
-    <iframe title="Bank of Micky Heist HQ" src="heist-room.html?role=mikael" style="width:100%;height:82vh;border:0;border-radius:18px;background:#05060a"></iframe>
+  <div class="section-intro"><div><span class="pill">2 PLAYER ESCAPE ROOM</span><h2>🏦 Bank of Micky Heist</h2><p>Mikael sees the control-room clues here while Lizzy sees the vault-side clues in TESTR. Stay on your call and solve each stage together.</p></div></div>
+  <div class="card" style="padding:10px;overflow:hidden">
+    <iframe id="hqHeistFrame" title="Bank of Micky Heist HQ" src="heist-room.html?role=mikael" style="width:100%;height:78vh;min-height:680px;border:0;border-radius:18px;background:#05060a;display:block"></iframe>
   </div>
 </section>
 

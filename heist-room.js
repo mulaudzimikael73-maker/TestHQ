@@ -133,7 +133,7 @@
     }
   };
 
-  const state = {data:null, busy:false, drafts:{}};
+  const state = {data:null, busy:false, routeOrder:[]};
 
   function resolveWorkerUrl(){
     const keys=['lizzyTelegramWorkerURL','testWorkerUrl','testWorkerURL','mikaelHQTestWorkerUrl','mikaelHQTestWorkerURL','mikaelTestWorkerUrl'];
@@ -203,11 +203,10 @@
     if(action.type==='choices') return `<div class="actionBox choices">${action.choices.map(ch=>`<label class="choicePill"><input type="radio" name="boxChoice" value="${escapeHtml(ch)}" ${stageState.choice===ch?'checked':''}><span>${escapeHtml(ch)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
     if(action.type==='checks') return `<div class="actionBox checks">${action.items.map(item=>`<label class="choicePill"><input type="checkbox" value="${escapeHtml(item.id)}" ${(stageState.selection||[]).includes(item.id)?'checked':''}><span>${escapeHtml(item.label)}</span></label>`).join('')}<button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
     if(action.type==='grid'){
-      const draftKey = `stage${stage}:path`;
-      const picked = state.drafts[draftKey] || stageState.path || [];
+      const picked = (state.routeOrder && Number(state.data?.currentStage)===2) ? state.routeOrder : (stageState.path || []);
       const cols=['A','B','C','D'];
       const rows=[1,2,3];
-      return `<div class="actionBox"><div class="laserGrid">${rows.map(row=>cols.map(col=>{const tile=col+row;return `<button type="button" class="tileBtn ${picked.includes(tile)?'selected':''}" data-tile="${tile}" aria-pressed="${picked.includes(tile)?'true':'false'}">${tile}</button>`}).join('')).join('')}</div><div class="tileMeta">Selected route: <b id="routePreview">${picked.join(' → ')||'None'}</b></div><button type="button" id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button></div>`;
+      return `<div class="actionBox"><p class="muted">Choose exactly one tile from each column, in the order Mikael tells you. Your click order matters.</p><div class="laserGrid">${rows.map(row=>cols.map(col=>{const tile=col+row;const idx=picked.indexOf(tile);return `<button type="button" class="tileBtn ${idx>=0?'selected':''}" data-tile="${tile}" data-col="${col}"><span>${tile}</span>${idx>=0?`<em>${idx+1}</em>`:''}</button>`}).join('')).join('')}</div><div class="tileMeta">Selected route: <b id="routePreview">${picked.join(' → ')||'None'}</b></div><div class="heistMiniRow"><button type="button" id="clearRouteBtn" class="secondaryBtn">Clear Route</button><button type="button" id="submitAction" class="primaryBtn" ${picked.length!==4?'disabled':''}>${escapeHtml(action.button)}</button></div></div>`;
     }
     if(action.type==='arm') return `<div class="actionBox"><button id="submitAction" class="primaryBtn">${escapeHtml(action.button)}</button><p class="muted">This enables Lizzy’s final keypad.</p></div>`;
     return '<p class="muted">No action.</p>';
@@ -236,6 +235,17 @@
     const resetWrap = $('#hqResetWrap');
     if(resetWrap) resetWrap.style.display = role==='mikael' ? 'flex' : 'none';
 
+    $$('.tileBtn').forEach(btn=>btn.addEventListener('click',()=>{
+      const tile=btn.dataset.tile, col=btn.dataset.col;
+      const existingIndex=state.routeOrder.indexOf(tile);
+      if(existingIndex>=0){ state.routeOrder.splice(existingIndex,1); }
+      else {
+        state.routeOrder=state.routeOrder.filter(x=>String(x).charAt(0)!==col);
+        state.routeOrder.push(tile);
+      }
+      render();
+    }));
+    $('#clearRouteBtn')?.addEventListener('click',()=>{state.routeOrder=[];render()});
     $('#submitAction')?.addEventListener('click', submitCurrentAction);
     $('#refreshBtn')?.addEventListener('click', ()=>load(true));
     $('#resetHeistBtn')?.addEventListener('click', resetHeist);
@@ -247,15 +257,16 @@
     const action = stage[role]?.action;
     let payload = {stage:stageNum, role};
     if(action?.type==='text') payload.answer = $('#answerInput')?.value?.trim() || '';
-    if(action?.type==='grid') payload.path = state.drafts[`stage${stageNum}:path`] || $$('.tileBtn.selected').map(x=>x.dataset.tile);
+    if(action?.type==='grid') payload.path = [...state.routeOrder];
     if(action?.type==='choices') payload.choice = $('input[name="boxChoice"]:checked')?.value || '';
     if(action?.type==='checks') payload.selection = $$('input[type="checkbox"]:checked').map(x=>x.value);
     if(action?.type==='arm') payload.arm = true;
     state.busy=true; $('#resultBox').textContent='Sending…';
     try{
       const res = await api('heist_submit', payload);
+      const previousStage=state.data?.currentStage;
       state.data = res.state;
-      if(action?.type==='grid') delete state.drafts[`stage${stageNum}:path`];
+      if(Number(previousStage)!==Number(state.data?.currentStage)) state.routeOrder=[];
       render();
       $('#resultBox').textContent = res.message || 'Move submitted.';
     }catch(err){ $('#resultBox').textContent='❌ '+err.message; }
@@ -266,8 +277,9 @@
     if(!confirm('Reset the full Bank of Micky Heist for both players?')) return;
     try{
       const res = await api('heist_reset', {role});
+      const previousStage=state.data?.currentStage;
       state.data = res.state;
-      if(action?.type==='grid') delete state.drafts[`stage${stageNum}:path`];
+      if(Number(previousStage)!==Number(state.data?.currentStage)) state.routeOrder=[];
       render();
       $('#resultBox').textContent='🔄 Heist reset. Both screens are back to Stage 1.';
     }catch(err){ $('#resultBox').textContent='❌ '+err.message; }
@@ -283,21 +295,6 @@
     }catch(err){ $('#connectionStatus').textContent = 'Connection issue'; $('#resultBox').textContent='❌ '+err.message; }
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    document.addEventListener('click',e=>{
-      const btn=e.target.closest?.('.tileBtn');
-      if(!btn) return;
-      e.preventDefault();
-      const stageNum=state.data?.currentStage||2;
-      const key=`stage${stageNum}:path`;
-      const current=[...(state.drafts[key]||[])];
-      const tile=btn.dataset.tile;
-      const i=current.indexOf(tile);
-      if(i>=0) current.splice(i,1); else current.push(tile);
-      state.drafts[key]=current;
-      btn.classList.toggle('selected',i<0);
-      btn.setAttribute('aria-pressed',i<0?'true':'false');
-      const preview=$('#routePreview'); if(preview) preview.textContent=current.join(' → ')||'None';
-    });
     $('#roleName').textContent = roleLabel;
     $('#roleBadge').textContent = roleBadge;
     render();

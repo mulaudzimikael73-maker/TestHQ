@@ -59,3 +59,6 @@ body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:radial-gra
 .hqResetWrap{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
 @media (max-width:980px){.heistGrid{grid-template-columns:1fr}.heistHero{flex-direction:column}.roleCard{width:100%}.progressDots{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:640px){.heistShell{padding:12px}.card,.heistHero{border-radius:18px;padding:15px}.heistHero h1{font-size:28px}.progressDots{grid-template-columns:repeat(2,1fr)}.laserGrid{grid-template-columns:repeat(2,1fr)}}
+.tileBtn{position:relative;min-height:62px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800}
+.tileBtn em{position:absolute;right:7px;top:6px;width:22px;height:22px;border-radius:50%;background:#ffd79c;color:#251707;font-style:normal;font-size:12px;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.28)}
+.heistMiniRow{display:flex;gap:10px;flex-wrap:wrap}.heistMiniRow>*{flex:1;min-width:150px}.primaryBtn:disabled{opacity:.45;cursor:not-allowed;transform:none}
