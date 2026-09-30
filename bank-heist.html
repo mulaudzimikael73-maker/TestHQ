@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Bank of Micky Heist</title>
-<link rel="stylesheet" href="bank-heist.css">
+<title>Catch Me If You Can — Bank of Micky</title>
+<link rel="stylesheet" href="bank-heist.css?v=20260930-cmiyc4">
 </head>
 <body>
 <div id="app" class="app" data-role="lizzy">
   <header class="topbar">
-    <div class="brand"><img src="heist-assets/bank-logo.webp" alt=""><div><small>BANK OF MICKY // PRIVATE SYSTEM</small><h1>THE HEIST</h1></div></div>
+    <div class="brand"><img src="heist-assets/bank-logo.webp" alt=""><div><small>BANK OF MICKY // PRIVATE SYSTEM</small><h1>CATCH ME IF YOU CAN</h1></div></div>
     <div class="topstats"><span id="rolePill" class="pill">LIZZY // FIELD</span><span id="timer" class="timer">15:00</span><button id="settingsBtn" class="iconBtn" title="Connection settings">⚙</button></div>
   </header>
 
@@ -47,17 +47,28 @@
     <section id="hqView" class="hqLayout hidden">
       <article class="mapPanel glass">
         <div class="panelHead"><div><p class="eyebrow">PRESIDENTIAL SECURITY NETWORK</p><h2>Bank Map</h2></div><div class="power"><small>SECURITY POWER</small><strong id="power">100</strong><i><b id="powerBar"></b></i></div></div>
+        <div id="hqAlert" class="hqAlert hidden"></div>
         <div id="bankMap" class="bankMap"></div>
+        <div class="intelStrip">
+          <div id="lastSeen" class="intelCard lastSeen"><small>LAST CONFIRMED</small><strong>NO CONFIRMED SIGHTING</strong><span>Use a camera check to confirm Lizzy.</span></div>
+          <div id="lastActivity" class="intelCard lastActivity"><small>RECENT SENSOR SIGNAL</small><strong>NO RECENT ACTIVITY</strong><span>Door, noise, loot and motion sensors appear here.</span></div>
+        </div>
+        <div class="cameraMonitor">
+          <div id="cameraPreview" class="cameraPreview">
+            <div class="cameraNoise"></div>
+            <div class="cameraOverlay"><small id="cameraRoomName">CAMERA NETWORK</small><strong id="cameraStatus">SELECT A CAMERA</strong><span id="cameraMeta">Camera checks create persistent snapshots and last-seen intelligence.</span></div>
+          </div>
+          <div id="cameraWall" class="cameraWall"></div>
+        </div>
         <div id="hqResult" class="resultBox"></div>
-        <div id="lastSeen" class="lastSeen">NO CONFIRMED SIGHTING</div>
       </article>
       <aside class="hqPanel glass">
-        <section><h3>Camera check <span id="cameraCd" class="cd"></span></h3><div class="inline"><select id="cameraRoom"></select><button id="cameraBtn">CHECK CAMERA · 18⚡</button></div></section>
+        <section><h3>Camera network <span id="cameraCd" class="cd"></span></h3><div class="inline"><select id="cameraRoom"></select><button id="cameraBtn">CHECK LIVE FEED · 18⚡</button></div></section>
         <section><h3>Dispatch guard</h3><div class="inline"><select id="guardId"><option value="A">Guard A</option><option value="B">Guard B</option></select><select id="guardRoom"></select><button id="guardBtn">SEND · 15⚡</button></div><div id="guardStatus" class="miniCards"></div></section>
         <section><h3>Lock connection <span id="lockCd" class="cd"></span></h3><div class="inline"><select id="lockEdge"></select><button id="lockBtn">LOCK 8s · 25⚡</button></div></section>
         <section><h3>Zone scan <span id="scanCd" class="cd"></span></h3><div class="inline"><select id="scanZone"><option value="front">Front — Reception + Offices</option><option value="secure">Secure — Security + Deposits</option><option value="vault">Vault</option><option value="escape">Escape — Loading + Garage</option></select><button id="scanBtn">SCAN · 30⚡</button></div></section>
         <section><h3>Protect exit <span id="protectCd" class="cd"></span></h3><div class="inline"><select id="protectExit"><option value="garage">Garage</option><option value="loading_bay">Loading Bay</option></select><button id="protectBtn">PROTECT 12s · 28⚡</button></div></section>
-        <section><h3>Incident feed</h3><div id="incidentFeed" class="feed"></div></section>
+        <section><h3>Incident feed <span class="feedHint">NEWEST FIRST</span></h3><div id="incidentFeed" class="feed"></div></section>
       </aside>
     </section>
 
@@ -79,6 +90,6 @@
   <dialog id="vaultDialog" class="targetDialog"><form method="dialog" id="vaultForm"><div class="dialogHead"><h3>Crack the main vault</h3><button value="cancel">×</button></div><p>Combine the four digits you discovered around the bank.</p><input id="vaultCode" inputmode="numeric" maxlength="8" placeholder="••••"><button class="primary" value="default">TRY CODE</button></form></dialog>
   <dialog id="bribeDialog" class="targetDialog"><form method="dialog" id="bribeForm"><div class="dialogHead"><h3>Offer a bribe</h3><button value="cancel">×</button></div><p>This comes out of the loot you are carrying if Mikael accepts.</p><input id="bribeAmount" type="number" min="500" step="500" value="1000"><button class="primary" value="default">SEND OFFER</button></form></dialog>
 </div>
-<script src="bank-heist.js"></script>
+<script src="bank-heist.js?v=20260930-cmiyc4"></script>
 </body>
 </html>
