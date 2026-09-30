@@ -1,6 +1,6 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mikael HQ — Letters & Chess</title><link rel="stylesheet" href="mikael-hq.css?v=20260930-original-testhq"><link rel="stylesheet" href="radio-hq.css?v=20260930-original-testhq"></head><body>
-<div id="login" class="screen"><div class="login-card"><div class="seal">🖤</div><p class="eyebrow">LIZZYOS // PRIVATE SYSTEM</p><h1>MIKAEL HQ</h1><p>Your private place to receive Lizzy's letters and play chess.</p><input id="hqKey" type="password" placeholder="HQ access key" autocomplete="off"><button id="loginBtn">Enter HQ</button><div id="loginStatus"></div></div></div>
-<div id="app" class="hidden"><aside><div class="brand">🖤 <b>MIKAEL HQ</b></div><nav><button data-view="letters" class="active">💌 Letters</button><button data-view="chess">♟️ Chess</button><button data-view="lessons">🧠 Lizzy Lessons</button><button data-view="mood">💗 My Mood</button><button data-view="annoy">😈 Annoy Lizzy</button></nav><button id="logoutBtn">Lock HQ</button></aside><main><header><p class="eyebrow">PRIVATE COMMAND CENTRE</p><h2 id="viewTitle">Letters from Lizzy</h2></header>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mikael HQ TEST LAB</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;500;700&display=swap"><link rel="stylesheet" href="test-hq.css?v=20260927-officecourt2"><link rel="stylesheet" href="radio-hq.css?v=20260930-radio-testlab1"></head><body>
+<div id="testBanner">🧪 MIKAEL HQ TEST LAB — ISOLATED FROM LIVE HQ</div><div id="login" class="screen"><div class="login-card"><div class="seal">🧪</div><p class="eyebrow">LIZZYOS // TEST SYSTEM</p><h1>MIKAEL HQ TEST LAB</h1><p>This copy is for testing only. It will not connect until you enter a separate test Worker URL.</p><input id="testWorkerUrl" type="url" placeholder="https://your-test-worker.workers.dev/" autocomplete="off"><input id="hqKey" type="password" placeholder="TEST HQ access key" autocomplete="off"><button id="loginBtn">Enter Test HQ</button><div id="loginStatus"></div></div></div>
+<div id="app" class="hidden"><aside><div class="brand">🧪 <b>MIKAEL HQ TEST</b></div><nav><button data-view="letters" class="active">💌 Letters</button><button data-view="chess">♟️ Chess</button><button data-view="lessons">🧠 Lizzy Lessons</button><button data-view="mood">💗 My Mood</button><button data-view="annoy">😈 Annoy Lizzy</button><button data-view="mizzygram">📸 MizzyGram</button><button data-view="world">📈 Market & Entertainment</button><button data-view="life">🎮 Lizzy Life</button><button data-view="heist">🏦 Catch Me If You Can</button></nav><button id="logoutBtn">Lock HQ</button></aside><main><header><p class="eyebrow">TEST COMMAND CENTRE</p><h2 id="viewTitle">Letters from Lizzy</h2></header>
 <section id="letters" class="view"><div class="section-intro"><div><span class="pill">TWO-WAY</span><h2>💌 Letters from Lizzy</h2><p>When Lizzy writes, her letter appears here. You can reply directly.</p></div><div class="intro-actions"><button class="primary" id="refreshLetters">↻ Refresh</button><button class="danger" id="clearLetters">🧹 Clear Everything</button></div></div><div id="lettersList"></div></section>
 <section id="chess" class="view hidden"><div class="section-intro"><div><span class="pill">2 PLAYER</span><h2>♟️ Mikael × Lizzy Chess</h2><p>You are Black. Lizzy is White.</p></div><div class="turn" id="chessTurn">Loading…</div></div><div class="chess-layout"><div class="card board-card"><div class="chess-board-wrap"><div id="chessBoard" class="board"></div></div><div class="board-actions"><button id="resetChess">New Game</button><button id="refreshChess">↻ Sync</button></div></div><div class="card"><h3>🎓 Teach Lizzy</h3><div id="helpRequests" class="help-requests empty">No requests.</div><textarea id="hintText" placeholder="Write an explanation or hint for Lizzy…"></textarea><button class="primary" id="sendHint">Send to Lizzy</button><hr><h3>📜 Move history</h3><div id="moveHistory" class="moves">—</div></div></div></section>
 
@@ -56,5 +56,58 @@
     <div id="annoyResult" class="meta" style="margin-top:10px"></div>
   </div>
 </section>
-</main></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="chess-fallback.js"></script><script src="mikael-hq.js"></script><script src="bank-heist-launcher.js?v=20260930-competitive-v3"></script>
-<script src="radio-hq.js?v=20260930-original-testhq"></script></body></html>
+<section id="mizzygram" class="view hidden">
+  <div class="mgHero"><div class="mgLogo">M</div><div><h2>MizzyGram Control Room</h2><p>Post, react and stir things up on Lizzy's feed.</p></div><span id="mgLive" class="mgLive">○ connecting…</span><button class="primary" id="mgRefresh" aria-label="Refresh">↻</button></div>
+  <div class="mgCols">
+    <div class="mgCol">
+      <div class="mgCard"><h3>Create post</h3>
+        <div class="mgLbl">Post as</div><div id="mgAccounts" class="mgAccts"></div>
+        <div id="mgPreview" class="mgPreview"></div>
+        <label class="mgDrop"><input type="file" id="mgPhoto" accept="image/*,video/*"><span id="mgPhotoLbl">📷🎬 Add photo or video <small>videos max 30 sec</small></span></label>
+        <textarea id="mgCaption" maxlength="500" placeholder="Write a caption…"></textarea>
+        <input id="mgTags" placeholder="Hashtags — BowlingQueen MrPerfect">
+        <div class="mgRow"><select id="mgMood" aria-label="Mood"></select><div class="mgSeg" id="mgAud"><button data-aud="everyone" class="on">🌍 Everyone</button><button data-aud="lizzy">💗 Lizzy only</button></div></div>
+        <button class="primary mgBig" id="mgPost">Post to MizzyGram</button><div id="mgPostResult" class="mgNote"></div></div>
+      <div class="mgCard"><h3>Trigger an event</h3>
+        <div class="mgEvents">
+          <button data-mg-event="viral"><i>🔥</i><b>Viral Moment</b><small>Everyone piles onto a post</small></button>
+          <button data-mg-event="bowling"><i>🎳</i><b>Bowling Challenge</b><small>Federation issues a challenge</small></button>
+          <button data-mg-event="breaking"><i>📰</i><b>Breaking News</b><small>A headline hits the feed</small></button>
+          <button data-mg-event="mystery"><i>👀</i><b>Mystery Account</b><small>Someone's watching…</small></button>
+          <button data-mg-event="mikael"><i>💗</i><b>Mikael Surprise</b><small>You reach out to Lizzy</small></button>
+        </div><div id="mgEvResult" class="mgNote"></div></div>
+    </div>
+    <div class="mgCol"><div class="mgCard"><h3>Live feed <small>react as Mikael</small></h3><div id="mgFeed" class="mgFeed"></div></div></div>
+  </div>
+</section>
+<section id="world" class="view hidden">
+  <div class="section-intro"><div><span class="pill">THE INTERNET CONTROL</span><h2>📈 Market & Entertainment</h2><p>Move the fictional market and fulfil entertainment purchases without revealing HQ controls to Lizzy.</p></div><div class="intro-actions"><button class="primary" id="worldRefresh">↻ Refresh Lizzy Internet</button></div></div>
+  <div class="worldCols">
+    <div class="card worldPanel"><h3>📈 Micky Stock Exchange</h3><p class="meta">Select a company, choose a movement and optionally attach a public fake-news headline.</p>
+      <label>Company</label><select id="worldStock"></select>
+      <div class="worldRow"><div><label>Action</label><select id="worldAction"><option value="pump">Pump stock</option><option value="drop">Drop stock</option><option value="crash">Crash stock</option><option value="rally">Huge rally</option><option value="recover">Recover stock</option><option value="gradual_rise">Gradual rise</option><option value="gradual_decline">Gradual decline</option><option value="freeze">Freeze price</option><option value="unfreeze">Unfreeze price</option></select></div><div><label>Approx. movement %</label><input id="worldPercent" type="number" min="1" max="80" value="12"></div></div>
+      <label>Public market headline <small>(optional)</small></label><input id="worldHeadline" maxlength="180" placeholder="Eventually Airways flight arrives on time. Investors suspicious.">
+      <label>Headline tone</label><select id="worldSentiment"><option value="positive">Positive</option><option value="negative">Negative</option><option value="catastrophic">Catastrophic</option><option value="ridiculously positive">Ridiculously positive</option><option value="neutral">Neutral</option></select>
+      <button class="primary worldBig" id="worldApplyStock">Apply to selected stock</button><div id="worldMarketResult" class="meta worldResult"></div>
+      <div class="worldGlobal"><button data-world-global="rally">🚀 Rally Entire Market</button><button data-world-global="crash">💥 Crash Entire Market</button><button data-world-global="recover">🩹 Recover Entire Market</button></div>
+      <div id="worldPrices" class="worldPrices"></div>
+    </div>
+    <div class="card worldPanel"><h3>🎟️ Entertainment Fulfilment</h3><p class="meta">When Lizzy buys a Theatre, Opera, Live Show or Exclusive Song ticket, it appears below. Upload the matching media and it is delivered into her Entertainment folder.</p><div id="worldEntStatus" class="worldResult meta">Waiting for Lizzy Internet sync…</div><div id="worldPurchases" class="worldPurchases"></div></div>
+  </div>
+</section>
+
+<section id="life" class="view hidden">
+  <div class="section-intro"><div><span class="pill">VIRTUAL LIFE TEST</span><h2>🎮 Lizzy Life</h2><p>Life Time is completely separate from real-world dates. It advances only when Lizzy completes a timed activity or explicitly skips Life time. Simply leaving the game open does nothing.</p></div><div class="intro-actions"><button class="primary" id="lifeHQRefresh">↻ Refresh Lizzy Life</button></div></div>
+  <div id="lifeHQStatus" class="turn">Waiting for Lizzy Life sync…</div>
+  <div id="lifeHQBody"></div>
+</section>
+
+
+<section id="heist" class="view hidden">
+  <div class="section-intro"><div><span class="pill">COMPETITIVE 2 PLAYER HEIST</span><h2>🏦 Catch Me If You Can</h2><p>Lizzy robs the Bank of Micky from TESTR while Mikael hunts her from TestHQ using camera intelligence, last-seen markers, guards, locks, scans and limited security power.</p></div></div>
+  <div class="card" style="padding:10px;overflow:hidden">
+    <iframe id="hqHeistFrame" title="Catch Me If You Can HQ" src="bank-heist.html?role=hq&v=4" style="width:100%;height:78vh;min-height:680px;border:0;border-radius:18px;background:#05060a;display:block"></iframe>
+  </div>
+</section>
+
+</main></div><script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script><script src="chess-fallback.js"></script><script src="test-hq.js?v=20260930-cmiyc4"></script><script src="radio-hq.js?v=20260930-radio-testlab1"></script><script src="test-world.js?v=20260927-lowkv8"></script><script src="test-life.js?v=20260928-lifev11"></script></body></html>

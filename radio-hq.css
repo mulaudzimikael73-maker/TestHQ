@@ -1,20 +1,17 @@
-/* Radio Control styles — deliberately scoped so the original TestHQ theme remains untouched. */
-#radio .radioGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-#radio .radioCard{background:#ffffff0d;border:1px solid #ffffff12;border-radius:22px;padding:18px;box-shadow:0 18px 42px #0002}
-#radio .radioCard h3{margin-top:0}
+/* TestHQ Radio Control — scoped so the original TestHQ design stays untouched */
+#radio{max-width:1150px}
+#radio .radioGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+#radio .radioCard{background:#ffffff0d;border:1px solid #ffffff12;border-radius:22px;padding:18px;box-shadow:0 16px 38px #0003}
+#radio .radioCard h3{margin:0 0 10px;color:#ffd6ec}
 #radio .radioCard textarea,#radio .radioCard input,#radio .radioCard select{width:100%;box-sizing:border-box;margin:6px 0 10px;padding:11px 12px;border:1px solid #ffffff18;border-radius:12px;background:#0003;color:#fff}
-#radio .radioCard textarea{min-height:100px;resize:vertical}
-#radio .radioCard input::placeholder,#radio .radioCard textarea::placeholder{color:#ffffff77}
-#radio .radioCard option{color:#111}
+#radio .radioCard select option{color:#111}
+#radio .radioCard textarea{min-height:96px;resize:vertical}
 #radio .radioRows{display:grid;gap:8px}
-#radio .radioRow{border:1px solid #ffffff12;border-radius:14px;padding:12px;background:#ffffff08;line-height:1.45}
+#radio .radioRow{border:1px solid #ffffff12;border-radius:14px;padding:11px;background:#ffffff08}
+#radio .radioRow small{opacity:.65}
 #radio .radioRow audio{width:100%;margin-top:8px}
-#radio .radioRow small{opacity:.68}
-#radio .radioBadge{display:inline-block;padding:5px 9px;margin-bottom:7px;border-radius:999px;background:#f08ac11c;color:#ffb8dc;font-size:11px;font-weight:800;text-transform:uppercase}
-#radio .radioDanger{background:#d74466!important;color:#fff!important}
-#radio .radio2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-#radio .radio3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
-#radio .radio3 label{font-size:12px;opacity:.82}
-#radio #radioStatus{margin:0 0 14px;opacity:.65;font-size:12px}
-#radio button{cursor:pointer}
-@media(max-width:700px){#radio .radio2,#radio .radio3{grid-template-columns:1fr}}
+#radio .radioBadge{display:inline-block;padding:4px 8px;border-radius:999px;background:#f08ac122;color:#ffd6ec;font-size:11px;font-weight:800;margin-right:7px}
+#radio .radio3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 10px}
+#radio .radio3 label{font-size:12px;padding:8px 9px;border:1px solid #ffffff12;border-radius:11px;background:#ffffff07}
+#radio .meta{opacity:.7;font-size:12px}
+@media(max-width:700px){#radio .radio3{grid-template-columns:1fr}}
