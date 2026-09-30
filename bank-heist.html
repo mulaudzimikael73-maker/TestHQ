@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bank of Micky Heist</title>
+<link rel="stylesheet" href="bank-heist.css">
+</head>
+<body>
+<div id="app" class="app" data-role="lizzy">
+  <header class="topbar">
+    <div class="brand"><img src="heist-assets/bank-logo.webp" alt=""><div><small>BANK OF MICKY // PRIVATE SYSTEM</small><h1>THE HEIST</h1></div></div>
+    <div class="topstats"><span id="rolePill" class="pill">LIZZY // FIELD</span><span id="timer" class="timer">15:00</span><button id="settingsBtn" class="iconBtn" title="Connection settings">⚙</button></div>
+  </header>
+
+  <main id="lobby" class="lobby">
+    <section class="briefing glass">
+      <p class="eyebrow">COMPETITIVE TWO-PLAYER MODE</p>
+      <h2 id="lobbyTitle">Lizzy, choose your heist kit.</h2>
+      <p id="lobbyText">Pick exactly three items. Mikael will only see whether you are ready — not what you chose.</p>
+      <div id="loadoutGrid" class="loadoutGrid"></div>
+      <div class="lobbyActions"><button id="readyBtn" class="primary">LOCK LOADOUT & READY UP</button><button id="startBtn" class="primary hidden">START 15-MINUTE HEIST</button><button id="resetBtn" class="danger hidden">RESET TEST</button></div>
+      <div id="lobbyStatus" class="statusLine">Connecting…</div>
+    </section>
+  </main>
+
+  <main id="game" class="game hidden">
+    <section id="lizzyView" class="lizzyLayout">
+      <article class="scene glass">
+        <div id="sceneImage" class="sceneImage"></div>
+        <div class="sceneShade"></div>
+        <div class="sceneHud"><span id="roomKicker">CURRENT LOCATION</span><h2 id="roomTitle">Reception</h2><p id="roomDescription"></p></div>
+        <div id="dangerBanner" class="dangerBanner hidden"></div>
+        <div id="busyBanner" class="busyBanner hidden"></div>
+      </article>
+      <aside class="fieldPanel glass">
+        <div class="moneyRow"><div><small>CARRYING</small><strong id="loot">MB0</strong></div><div><small>STRIKES</small><strong id="strikes">0 / 3</strong></div></div>
+        <div id="fieldResult" class="resultBox"></div>
+        <section><h3>Routes</h3><div id="routes" class="buttonGrid"></div></section>
+        <section><h3>Room actions</h3><div id="roomActions" class="buttonGrid"></div></section>
+        <section><h3>Equipment</h3><div id="equipment" class="equipment"></div></section>
+        <section><h3>Clues</h3><div id="clues" class="clues"></div></section>
+        <section class="dropRow"><button data-drop="2000">Drop MB2,000</button><button data-drop="5000">Drop MB5,000</button><button data-drop="all">Drop All</button></section>
+      </aside>
+    </section>
+
+    <section id="hqView" class="hqLayout hidden">
+      <article class="mapPanel glass">
+        <div class="panelHead"><div><p class="eyebrow">PRESIDENTIAL SECURITY NETWORK</p><h2>Bank Map</h2></div><div class="power"><small>SECURITY POWER</small><strong id="power">100</strong><i><b id="powerBar"></b></i></div></div>
+        <div id="bankMap" class="bankMap"></div>
+        <div id="hqResult" class="resultBox"></div>
+        <div id="lastSeen" class="lastSeen">NO CONFIRMED SIGHTING</div>
+      </article>
+      <aside class="hqPanel glass">
+        <section><h3>Camera check <span id="cameraCd" class="cd"></span></h3><div class="inline"><select id="cameraRoom"></select><button id="cameraBtn">CHECK CAMERA · 18⚡</button></div></section>
+        <section><h3>Dispatch guard</h3><div class="inline"><select id="guardId"><option value="A">Guard A</option><option value="B">Guard B</option></select><select id="guardRoom"></select><button id="guardBtn">SEND · 15⚡</button></div><div id="guardStatus" class="miniCards"></div></section>
+        <section><h3>Lock connection <span id="lockCd" class="cd"></span></h3><div class="inline"><select id="lockEdge"></select><button id="lockBtn">LOCK 8s · 25⚡</button></div></section>
+        <section><h3>Zone scan <span id="scanCd" class="cd"></span></h3><div class="inline"><select id="scanZone"><option value="front">Front — Reception + Offices</option><option value="secure">Secure — Security + Deposits</option><option value="vault">Vault</option><option value="escape">Escape — Loading + Garage</option></select><button id="scanBtn">SCAN · 30⚡</button></div></section>
+        <section><h3>Protect exit <span id="protectCd" class="cd"></span></h3><div class="inline"><select id="protectExit"><option value="garage">Garage</option><option value="loading_bay">Loading Bay</option></select><button id="protectBtn">PROTECT 12s · 28⚡</button></div></section>
+        <section><h3>Incident feed</h3><div id="incidentFeed" class="feed"></div></section>
+      </aside>
+    </section>
+
+    <aside class="comms glass">
+      <div class="commsHead"><div><small>SECURE-ish CHANNEL</small><h3>Negotiation / Bluffing</h3></div><button id="toggleComms" class="iconBtn">—</button></div>
+      <div id="chat" class="chat"></div>
+      <div id="dealBox" class="dealBox hidden"></div>
+      <form id="chatForm" class="chatForm"><input id="chatInput" maxlength="320" placeholder="Say something misleading…"><button>Send</button></form>
+      <div id="dealControls" class="dealControls"></div>
+      <div id="announcements" class="announcements hidden"></div>
+    </aside>
+  </main>
+
+  <div id="endScreen" class="endScreen hidden"><div class="endCard glass"><img id="endPortrait" alt=""><p class="eyebrow" id="endEyebrow"></p><h2 id="endTitle"></h2><p id="endText"></p><div id="endMoney" class="endMoney"></div><button id="endClose">BACK TO HEIST SCREEN</button></div></div>
+
+  <dialog id="settings" class="settings"><form method="dialog"><div class="dialogHead"><h3>Heist connection</h3><button value="cancel">×</button></div><label>Cloudflare Worker URL<input id="workerUrl" type="url" placeholder="https://…workers.dev/"></label><label id="hqKeyLabel" class="hidden">HQ Key<input id="hqKeyInput" type="password" autocomplete="off"></label><p>This test uses the same Cloudflare Worker/KV bridge as your other cross-device features.</p><button id="saveSettings" value="default" class="primary">Save & reconnect</button></form></dialog>
+
+  <dialog id="targetDialog" class="targetDialog"><form method="dialog"><div class="dialogHead"><h3 id="targetTitle">Choose target</h3><button value="cancel">×</button></div><div id="targetButtons" class="buttonGrid"></div></form></dialog>
+  <dialog id="vaultDialog" class="targetDialog"><form method="dialog" id="vaultForm"><div class="dialogHead"><h3>Crack the main vault</h3><button value="cancel">×</button></div><p>Combine the four digits you discovered around the bank.</p><input id="vaultCode" inputmode="numeric" maxlength="8" placeholder="••••"><button class="primary" value="default">TRY CODE</button></form></dialog>
+  <dialog id="bribeDialog" class="targetDialog"><form method="dialog" id="bribeForm"><div class="dialogHead"><h3>Offer a bribe</h3><button value="cancel">×</button></div><p>This comes out of the loot you are carrying if Mikael accepts.</p><input id="bribeAmount" type="number" min="500" step="500" value="1000"><button class="primary" value="default">SEND OFFER</button></form></dialog>
+</div>
+<script src="bank-heist.js"></script>
+</body>
+</html>
