@@ -13,3 +13,11 @@
 #radio .small{padding:7px 10px;font-size:11px}.liveCard{border-color:#ff506f55!important;box-shadow:0 0 0 1px #ff506f12,0 18px 44px #0005!important}.liveControls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.liveStatus{margin:10px 0;padding:10px;border-radius:12px;background:#ff33551a;border:1px solid #ff506f30;color:#ffd8df}.liveControls strong{margin-left:auto;color:#ffb8c6}.meta{opacity:.72;font-size:12px}
 @media(max-width:760px){#radio .radioCard.wide{grid-column:span 1}#radio .radio3{grid-template-columns:1fr}.liveControls strong{margin-left:0}}
 #radio .radioBundled{font-size:11px;color:#b8ffd1;font-weight:800}
+#radio .radioLabel{display:block;font-size:12px;color:#ffd6ec;font-weight:800;margin-top:4px}
+#radio .playNowBtn{background:linear-gradient(135deg,#c93a86,#6d3bbb);border-color:#ff9dcc}
+#radio .manualStatus{background:#7d4cff16;border-color:#a98aff38;color:#e5dbff}
+#radio .postLiveChooser{display:none;margin:12px 0;padding:12px;border-radius:14px;border:1px solid #73f2a955;background:linear-gradient(145deg,#10331f99,#171322);box-shadow:inset 0 1px #ffffff12}
+#radio .postLiveChooser.show{display:block}
+#radio .postLiveChooser>b{display:block;color:#baffd2;margin-bottom:7px}
+#radio .postLiveActions{display:flex;gap:8px;flex-wrap:wrap}
+#radio .postLiveActions button{flex:1;min-width:130px}
