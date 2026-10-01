@@ -1,17 +1,15 @@
-/* TestHQ Radio Control — scoped so the original TestHQ design stays untouched */
-#radio{max-width:1150px}
-#radio .radioGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
-#radio .radioCard{background:#ffffff0d;border:1px solid #ffffff12;border-radius:22px;padding:18px;box-shadow:0 16px 38px #0003}
-#radio .radioCard h3{margin:0 0 10px;color:#ffd6ec}
-#radio .radioCard textarea,#radio .radioCard input,#radio .radioCard select{width:100%;box-sizing:border-box;margin:6px 0 10px;padding:11px 12px;border:1px solid #ffffff18;border-radius:12px;background:#0003;color:#fff}
-#radio .radioCard select option{color:#111}
-#radio .radioCard textarea{min-height:96px;resize:vertical}
-#radio .radioRows{display:grid;gap:8px}
-#radio .radioRow{border:1px solid #ffffff12;border-radius:14px;padding:11px;background:#ffffff08}
-#radio .radioRow small{opacity:.65}
-#radio .radioRow audio{width:100%;margin-top:8px}
-#radio .radioBadge{display:inline-block;padding:4px 8px;border-radius:999px;background:#f08ac122;color:#ffd6ec;font-size:11px;font-weight:800;margin-right:7px}
-#radio .radio3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 10px}
-#radio .radio3 label{font-size:12px;padding:8px 9px;border:1px solid #ffffff12;border-radius:11px;background:#ffffff07}
-#radio .meta{opacity:.7;font-size:12px}
-@media(max-width:700px){#radio .radio3{grid-template-columns:1fr}}
+/* TEST HQ Radio Control — fully scoped to preserve the original TestHQ shell */
+#radio{max-width:1180px}
+#radio .radioGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:14px}
+#radio .radioCard{background:linear-gradient(145deg,#211021d9,#120d1bdd);border:1px solid #f08ac12b;border-radius:22px;padding:18px;box-shadow:0 16px 38px #0005}
+#radio .radioCard.wide{grid-column:span 2}#radio .radioCard h3{margin:0 0 10px;color:#ffd6ec}
+#radio .radioCard textarea,#radio .radioCard input,#radio .radioCard select{width:100%;box-sizing:border-box;margin:6px 0 10px;padding:11px 12px;border:1px solid #f08ac133;border-radius:12px;background:#0a0810cc;color:#fff}
+#radio .radioCard input[type=file]{padding:8px;background:#160d1c}#radio .radioCard select option{color:#111}#radio .radioCard textarea{min-height:82px;resize:vertical}
+#radio .radioRows{display:grid;gap:8px}.scrollRows{max-height:520px;overflow:auto;padding-right:3px}
+#radio .radioRow{border:1px solid #f08ac122;border-radius:14px;padding:11px;background:#ffffff08}.radioRow small{display:block;opacity:.72;margin-top:3px}.radioRow audio{width:100%;margin-top:8px}
+#radio .radioBadge{display:inline-block;padding:4px 8px;border-radius:999px;background:#f08ac122;color:#ffd6ec;font-size:11px;font-weight:800;margin-right:7px}.radioSeed{font-size:9px;border:1px solid #ff8ac955;padding:2px 5px;border-radius:999px;margin-left:6px;color:#ffc8e4}.radioNeeds{font-size:11px;color:#ffb8da;font-weight:700}
+#radio .radio3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 10px}#radio .radio3 label{font-size:12px;padding:8px 9px;border:1px solid #f08ac122;border-radius:11px;background:#ffffff07}
+#radio .radioForm{padding:10px;border:1px solid #f08ac11f;border-radius:16px;background:#0002;margin-bottom:12px}.radioMediaActions{display:grid;gap:6px;margin-top:8px}.radioMediaActions audio{width:100%}
+#radio .small{padding:7px 10px;font-size:11px}.liveCard{border-color:#ff506f55!important;box-shadow:0 0 0 1px #ff506f12,0 18px 44px #0005!important}.liveControls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.liveStatus{margin:10px 0;padding:10px;border-radius:12px;background:#ff33551a;border:1px solid #ff506f30;color:#ffd8df}.liveControls strong{margin-left:auto;color:#ffb8c6}.meta{opacity:.72;font-size:12px}
+@media(max-width:760px){#radio .radioCard.wide{grid-column:span 1}#radio .radio3{grid-template-columns:1fr}.liveControls strong{margin-left:0}}
+#radio .radioBundled{font-size:11px;color:#b8ffd1;font-weight:800}
