@@ -27,3 +27,12 @@
 #garden .gmhq-memory-img img{max-width:100%;width:100%;height:225px;object-fit:contain}
 #garden .gmhq-list{max-height:600px}
 @media(max-width:680px){#garden .gmhq-memory{grid-template-columns:1fr}#garden .gmhq-memory-img img{max-height:180px}#garden .gmhq-fieldrow{grid-template-columns:1fr}#garden .gmhq-flowers{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Test HQ: quantity-aware bouquet creator */
+#garden .gmhq-flowers .gmhq-flower{margin:0!important;min-height:150px}
+#garden .gmhq-flowers .gmhq-qty{display:flex;gap:5px;width:100%;justify-content:center;align-items:center;margin-top:auto}
+#garden .gmhq-flowers .gmhq-qty button{min-width:33px;flex:1;min-height:34px;padding:2px 9px;font-size:20px;margin:0;background:#e9cfdc;color:#27192b}
+#garden .gmhq-bouquet-preview{min-height:120px;border-radius:15px;border:1px solid #e2cbe450;margin:13px 0;padding:12px;display:grid;justify-items:center;align-items:center;gap:9px;background:radial-gradient(circle,#ecdbf62c,#4b3a5e22)}
+#garden .gmhq-preview-flowers{min-height:76px;display:flex;justify-content:center;flex-wrap:wrap;align-items:center}
+#garden .gmhq-preview-flowers img{width:62px;height:75px;object-fit:contain;margin-right:-6px;filter:drop-shadow(2px 5px 4px #18121f99)}
+#garden .gmhq-bouquet-preview small{font-size:12px;opacity:.9}
