@@ -36,3 +36,23 @@
 #garden .gmhq-preview-flowers{min-height:76px;display:flex;justify-content:center;flex-wrap:wrap;align-items:center}
 #garden .gmhq-preview-flowers img{width:62px;height:75px;object-fit:contain;margin-right:-6px;filter:drop-shadow(2px 5px 4px #18121f99)}
 #garden .gmhq-bouquet-preview small{font-size:12px;opacity:.9}
+
+
+/* Bouquets: realistic AI-generated wrapping and satin bows, layered with the exact selected stems. */
+#garden .gmhq-bouquet-visual{position:relative;isolation:isolate;width:min(100%,400px);aspect-ratio:1;margin:14px auto 3px;overflow:visible}
+#garden .gmhq-bouquet-art,#garden .gmhq-bouquet-paper-front{position:absolute;inset:0;background:var(--gmhq-wrap) center / contain no-repeat;pointer-events:none}
+#garden .gmhq-bouquet-art{z-index:0;filter:drop-shadow(0 15px 16px #07060d73)}
+#garden .gmhq-bouquet-florals{position:absolute;z-index:1;top:12%;left:15%;width:70%;height:48%;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+#garden .gmhq-bouquet-florals img{display:block;flex:0 0 var(--stem-width,26%);width:var(--stem-width,26%);height:100%;object-fit:contain;margin-left:-5.5%;transform:translateY(var(--stem-offset,0px)) rotate(var(--stem-rot,0deg));filter:drop-shadow(0 6px 5px #26182566)}
+#garden .gmhq-bouquet-florals img:first-child{margin-left:0}
+#garden .gmhq-bouquet-paper-front{z-index:2;clip-path:polygon(0 48%,100% 48%,100% 100%,0 100%)}
+#garden .gmhq-bouquet-ribbon{position:absolute;z-index:3;left:50%;top:61%;width:52%;height:38%;transform:translateX(-50%);object-fit:fill;pointer-events:none;filter:drop-shadow(0 5px 5px #09061062)}
+#garden .gmhq-bouquet-visual-glow .gmhq-bouquet-florals img{filter:drop-shadow(0 0 11px #d2dcffdd) drop-shadow(0 5px 6px #3c305a)}
+#garden .gmhq-bouquet-visual-glow .gmhq-bouquet-art{filter:drop-shadow(0 0 17px #bdaeffa8) drop-shadow(0 13px 16px #07060d73)}
+#garden .gmhq-bouquet-empty{align-self:center;max-width:80%;padding:9px 12px;border-radius:10px;background:#201722dd;border:1px solid #ffffff66;color:#fff;font-size:12px;text-align:center}
+#garden .gmhq-bouquet-details{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:4px 0 15px}
+#garden .gmhq-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:100px;background:#ffffff1c;border:1px solid #ffffff20;color:#f5e6f1;font-size:12px;font-weight:700}
+#garden .gmhq-badge img{width:28px;height:28px;object-fit:contain;vertical-align:middle}
+#garden .gmhq-list .gmhq-bouquet-visual{max-width:245px}
+#garden .gmhq-list .gmhq-bouquet-details{margin-bottom:10px}
+@media(max-width:540px){#garden .gmhq-bouquet-visual{width:min(100%,310px)}#garden .gmhq-bouquet-ribbon{top:62%;height:38%}}
