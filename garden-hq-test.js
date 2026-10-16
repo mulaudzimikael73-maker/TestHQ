@@ -14,11 +14,11 @@
  const flowers=[...originals,...treeFlowers,...special],catalog=Object.fromEntries(flowers.map(x=>[x.id,x]));
  const glowIds=new Set(['moonflower','lunarLavender','midnightTulip','moonlightOrchid','starLily','silverRose','celestialBlossom','eternalBlossom']);
  const deco={butterflyFountain:'⛲ Butterfly Fountain',moonLantern:'🏮 Moon Lantern',gardenBench:'🪑 Garden Bench',starPlanter:'✨ Star Planter',butterflyStatue:'🦋 Butterfly Statue',topiary:'🌳 Flower Topiary',miniFountain:'⛲ Mini Fountain'};
- const wrapOptions=['Blush Pink','Classic Cream','Midnight Blue','Starlight Silver'];
- const ribbonOptions=['White Satin','Gold','Pink','Moonbeam'];
+ const wrapOptions=['Blush Pink','Classic Cream','Midnight Blue','Starlight Silver','Sage Green','Lavender','Burgundy','Champagne','Matte Black'];
+ const ribbonOptions=['White Satin','Gold','Pink','Moonbeam','Sage Satin','Burgundy Satin','Royal Blue','Black Satin','Peach Satin'];
  const bouquetUi='assets/bouquet-ui/';
- const wrapArt={'Blush Pink':bouquetUi+'wrap-blush-pink.webp','Classic Cream':bouquetUi+'wrap-classic-cream.webp','Midnight Blue':bouquetUi+'wrap-midnight-blue.webp','Starlight Silver':bouquetUi+'wrap-starlight-silver.webp'};
- const ribbonArt={'White Satin':bouquetUi+'ribbon-white-satin.webp','Gold':bouquetUi+'ribbon-gold.webp','Pink':bouquetUi+'ribbon-pink.webp','Moonbeam':bouquetUi+'ribbon-moonbeam.webp'};
+ const wrapArt={'Blush Pink':bouquetUi+'wrap-blush-pink.webp','Classic Cream':bouquetUi+'wrap-classic-cream.webp','Midnight Blue':bouquetUi+'wrap-midnight-blue.webp','Starlight Silver':bouquetUi+'wrap-starlight-silver.webp','Sage Green':bouquetUi+'wrap-sage-green.webp','Lavender':bouquetUi+'wrap-lavender.webp','Burgundy':bouquetUi+'wrap-burgundy.webp','Champagne':bouquetUi+'wrap-champagne.webp','Matte Black':bouquetUi+'wrap-matte-black.webp'};
+ const ribbonArt={'White Satin':bouquetUi+'ribbon-white-satin.webp','Gold':bouquetUi+'ribbon-gold.webp','Pink':bouquetUi+'ribbon-pink.webp','Moonbeam':bouquetUi+'ribbon-moonbeam.webp','Sage Satin':bouquetUi+'ribbon-sage.webp','Burgundy Satin':bouquetUi+'ribbon-burgundy.webp','Royal Blue':bouquetUi+'ribbon-royal-blue.webp','Black Satin':bouquetUi+'ribbon-black.webp','Peach Satin':bouquetUi+'ribbon-peach.webp'};
  const locations={memoryTree:'🌳 Beneath Memory Tree',fountain:'⛲ Beside Wishing Fountain',hedge:'🌿 Secret Hedge'};
  let chosen=[],wrap=wrapOptions[0],ribbon=ribbonOptions[0],message='',glow=false,kind='plant',itemId='moonlightOrchid',location='memoryTree',giftMessage='';
  let data={bouquets:[],surprises:[],progress:{},deliveries:{total:0,fromLizzy:0,fromMikael:0}};
