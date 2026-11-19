@@ -1,0 +1,7 @@
+/* Optional additive style, to include in the ORIGINAL Test HQ chess page after DOM selector confirmation.
+   Does not change chess rules, saved state, turns or move buttons. */
+.lizzy-chess-piece-white{font-family:"DejaVu Sans","Segoe UI Symbol","Noto Sans Symbols 2",serif!important;color:#fffdf3!important;-webkit-text-stroke:1.5px #242424!important;text-shadow:-1px -1px #242424,1px 1px #242424,0 1px #242424!important;font-variant-emoji:text!important}
+.lizzy-chess-piece-black{font-family:"DejaVu Sans","Segoe UI Symbol","Noto Sans Symbols 2",serif!important;color:#17181b!important;-webkit-text-stroke:.85px #f5efe4!important;text-shadow:0 0 1px #f5efe4!important;font-variant-emoji:text!important}
+/* Square contrast only on known board-square classes; do not change other site styling. */
+[data-lizzy-chess-contrast="1"] [data-square]:focus-visible,
+[data-lizzy-chess-contrast="1"] .square:focus-visible{outline:3px solid #22643e;outline-offset:-3px}
