@@ -100,3 +100,75 @@
 .worldHolding>div:first-child{display:grid;gap:3px}.worldHolding>div:first-child b{font-size:17px}.worldHolding>div:first-child span{font-size:12px;opacity:.7}.worldHoldingNumbers{display:grid;gap:3px;text-align:right}.worldHoldingNumbers strong{font-size:15px}.worldHoldingNumbers span{font-size:12px;opacity:.85}.worldGain{color:#75f0ad!important}.worldLoss{color:#ff8a9a!important}
 .worldTrades{display:grid;gap:8px}.worldTrade{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.04);border-left:4px solid #888}.worldTrade.buy{border-left-color:#8b7cff}.worldTrade.sell{border-left-color:#72deb0}.worldTrade div{display:grid;gap:3px}.worldTrade div span{font-size:11px;opacity:.65}.worldTrade>strong{text-align:right}.worldTrade>strong small{display:block;font-size:10px;opacity:.65;font-weight:500}
 @media(max-width:760px){.worldHolding{grid-template-columns:1fr}.worldHoldingNumbers{text-align:left}.worldPortfolioTitle{align-items:start;flex-direction:column}.worldTrade{align-items:start}.worldTrade>strong{font-size:12px}}
+
+.heistFrame{display:block;width:100%;height:calc(100dvh - 170px);min-height:650px;border:1px solid #ad8754;border-radius:18px;background:#0b0e11}#heist .section-intro{margin-bottom:14px}@media(max-width:700px){.heistFrame{height:85dvh;min-height:620px;border-radius:10px}}
+
+
+/* MAIN HQ ACCESSIBILITY / NAVIGATION REPAIR: 16 OCT 2026 */
+#app{min-height:100vh;min-height:100dvh}
+#app>aside{position:fixed;z-index:80;left:0;top:0;bottom:auto;height:100vh;height:100dvh;width:245px;display:flex;flex-direction:column;min-height:0;gap:0;overflow:hidden;padding:16px 13px 14px;background:linear-gradient(160deg,#201425,#18121c);border-right:1px solid #ffffff28;box-shadow:8px 0 22px #0003}
+#app>aside .brand{padding:11px 8px 17px;flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;font-size:14px;line-height:1.4}
+#app>aside nav{display:flex!important;flex-direction:column;align-items:stretch;gap:5px;min-height:0;min-width:0;flex:1 1 auto;margin:0 0 10px!important;padding:1px 7px 14px 2px;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#f08ac188 #ffffff12;-webkit-overflow-scrolling:touch}
+#app>aside nav::-webkit-scrollbar{width:7px}#app>aside nav::-webkit-scrollbar-thumb{background:#f08ac188;border-radius:16px}
+#app>aside nav button{display:block!important;flex:0 0 auto;min-height:43px!important;line-height:1.3;width:100%;text-align:left;white-space:normal;word-break:normal;overflow-wrap:anywhere;padding:11px 12px!important}
+#app>aside nav button:focus-visible,#hqMobileNavToggle:focus-visible,#hqNavClose:focus-visible{outline:3px solid #ffd4ec;outline-offset:2px}
+#app>aside nav button.active{background:#f08ac12e;border:1px solid #f08ac15b}
+#app>aside #logoutBtn{flex:0 0 auto;width:100%;margin:0;padding:13px 12px}
+#app>main{margin-left:245px;width:calc(100% - 245px);max-width:none;min-width:0;padding:24px clamp(14px,2.8vw,35px) 80px;overflow-x:clip}
+#app>main>.view{max-width:1150px;width:100%;min-width:0}
+#hqNavClose,#hqMobileNavToggle,#hqNavScrim{display:none}
+@media(max-width:800px){
+ #app>aside{position:fixed!important;top:0;left:0;bottom:auto;transform:translateX(-104%);transition:transform .23s ease;width:min(330px,87vw);max-width:87vw;height:100vh;height:100dvh;padding:12px 12px 16px;z-index:211;visibility:hidden;pointer-events:none;overflow:hidden}
+ body.hq-nav-open #app>aside{transform:translateX(0);visibility:visible;pointer-events:auto}
+ #app>aside nav{overflow-y:auto!important;max-height:none;flex:1 1 auto;margin:0 0 8px!important}
+ #app>aside nav button{min-height:47px!important;font-size:14px}
+ #app>main{margin-left:0!important;width:100%;max-width:none;padding:10px 14px 80px;overflow-x:clip}
+ #app>main>header{position:sticky;top:0;z-index:45;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#1f1420ee;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);padding:13px 4px;margin:0 0 18px;border-bottom:1px solid #ffffff24}
+ #app>main>header>*{margin:0}
+ #app>main>header .eyebrow{display:none}
+ #app>main>header h2{font-size:clamp(17px,4vw,25px);min-width:0;overflow-wrap:anywhere}
+ #hqMobileNavToggle{display:inline-flex!important;align-items:center;gap:8px;flex:0 0 auto;min-height:45px;padding:9px 12px;border-radius:12px;background:#f08ac1;color:#28111e;border:0;font-weight:800;cursor:pointer}
+ #hqNavClose{display:inline-flex!important;align-items:center;justify-content:center;background:#ffffff20;color:#fff;border:0;border-radius:10px;min-height:39px;min-width:39px;padding:6px;cursor:pointer}
+ #hqNavScrim{display:block;position:fixed;inset:0;background:#08060ed9;z-index:210;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .23s,visibility .23s}
+ body.hq-nav-open #hqNavScrim{opacity:1;visibility:visible;pointer-events:auto}
+ body.hq-nav-open{overflow:hidden}
+ body.hq-nav-open #app>aside{touch-action:pan-y}
+ .section-intro{gap:8px;min-width:0}.intro-actions{flex-wrap:wrap}
+}
+@media(max-width:360px){#hqMobileNavToggle span{display:none}}
+@media(prefers-reduced-motion:reduce){#app>aside,#hqNavScrim{transition:none!important}}
+
+/* November 4, 2026: persistent mobile shortcuts for newly added HQ sections */
+#hqPhoneQuickNav{display:none}
+@media(max-width:800px){
+  #app>main>header .hqPhoneQuickNav{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    flex:1 1 100%;width:100%;min-width:0;
+    margin-top:8px;padding-bottom:4px;
+  }
+  #app>main>header .hqPhoneQuickNav button{
+    display:flex!important;justify-content:center;align-items:center;
+    min-height:45px;min-width:0;line-height:1.25;
+    font:700 12px/1.25 system-ui,-apple-system,sans-serif;
+    white-space:normal;overflow-wrap:anywhere;text-align:center;
+    padding:10px 8px;border:1px solid #ffbbd680;
+    border-radius:12px;background:linear-gradient(140deg,#4c233c,#723251);
+    color:#fff1f6;box-shadow:0 2px 10px #0003;cursor:pointer;
+  }
+  #app>main>header .hqPhoneQuickNav button.active,
+  #app>main>header .hqPhoneQuickNav button[aria-current="page"]{
+    background:linear-gradient(130deg,#a34b79,#803154);
+    border-color:#ffd2e8;color:white;
+  }
+  #app>main>header{align-content:start}
+  #app>main #university,#app>main #tiny{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  #app>main #uomHQMount,#app>main #tinyHQMount{min-width:0;max-width:100%;overflow-x:clip}
+}
+@media(max-width:340px){#app>main>header .hqPhoneQuickNav button{font-size:11px;padding:9px 5px}}
+
+/* TEST HQ chess piece contrast: explicit colours for all glyphs. */
+#chessBoard .sq.lizzy-chess-piece-white{color:#fffef5!important;-webkit-text-stroke:1.65px #201d21!important;text-shadow:0 2px #161318,1px 0 #161318,-1px 0 #161318;font-family:"DejaVu Sans","Segoe UI Symbol",serif!important}
+#chessBoard .sq.lizzy-chess-piece-black{color:#111016!important;-webkit-text-stroke:1.0px #f4e9da!important;text-shadow:0 1px #f7eddd,-1px 0 #f7eddd;font-family:"DejaVu Sans","Segoe UI Symbol",serif!important}
+#chessBoard .sq:focus-visible{outline:4px solid #2a8e73!important;outline-offset:-4px}
