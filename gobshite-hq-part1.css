@@ -1,0 +1,28 @@
+/* Only inside the existing Micky News screen; no Test Lab route. */
+.gobHQDesk{margin-top:24px;color:#3f2939;max-width:100%;overflow-wrap:anywhere}
+.gobHQDesk *{box-sizing:border-box}
+.gobHQHeading{background:#fff8f1;border:1px solid #dbc2b5;border-radius:14px;padding:16px}
+.gobHQHeading small{font-weight:800;letter-spacing:.09em;color:#965065}
+.gobHQHeading h2{font-family:Georgia,serif;color:#56233e;font-size:clamp(1.3rem,3vw,1.85rem);margin:8px 0}
+.gobHQHeading p{line-height:1.55;margin:5px 0}
+.gobHQNumbers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
+.gobHQNumbers>div{background:#fffdf8;border:1px solid #e2cfc3;border-radius:12px;padding:12px;text-align:center;display:grid;gap:3px}
+.gobHQNumbers b{font-size:1.8rem;color:#6d244c}.gobHQNumbers span{color:#77626d;font-size:.79rem}
+.gobHQArea{background:#fffdf8;border:1px solid #e2cfc3;border-radius:12px;margin:14px 0;padding:15px}
+.gobHQArea h3{margin:0 0 10px;font-family:Georgia,serif;color:#5d2c47}
+.gobHQOrder{background:#fff;border:1px solid #e7d6ca;border-radius:11px;padding:15px;margin:12px 0}
+.gobHQOrderTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.gobHQTag{font-size:.76rem;font-weight:800;letter-spacing:.06em;color:#872c52}
+.gobHQOrderTop small,.gobHQMeta{color:#7c6674;font-size:.8rem}
+.gobHQOrder h4{margin:10px 0;font-family:Georgia,serif;font-size:1.18rem}.gobHQOrder p{white-space:pre-wrap;line-height:1.55}
+.gobHQActions{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:12px}
+.gobHQDesk button{font:inherit;min-height:43px;padding:10px 13px;background:#74274d;border:1px solid #74274d;color:white;border-radius:9px;cursor:pointer;font-weight:700}
+.gobHQDesk button.secondary{background:white;color:#74274d}.gobHQDesk button.warn{background:#8c3b2f;border-color:#8c3b2f}
+.gobHQDesk button:disabled{opacity:.5}.gobHQDesk button:focus-visible,.gobHQDesk input:focus-visible,.gobHQDesk textarea:focus-visible{outline:3px solid #bf83a5;outline-offset:2px}
+.gobHQDesk label{font-weight:700;font-size:.87rem;display:grid;gap:6px;flex:1 1 180px}
+.gobHQDesk input,.gobHQDesk textarea{font:inherit;display:block;width:100%;min-height:43px;padding:10px;border-radius:8px;border:1px solid #d3b8b8;background:white;color:#342635}
+.gobHQActions label:last-child{flex:1 1 100%}.gobHQEdit{margin:12px 0;background:#fff8ef;padding:12px;border-radius:7px}.gobHQEdit label{margin:10px 0}
+.gobHQGood{background:#eaf7ee;border-radius:6px;padding:9px}.gobHQAlert,.gobHQNotice,.gobHQFeedback{background:#fff1db;border-radius:6px;padding:9px;line-height:1.5}
+.gobHQPollVotes>div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e4d5cb}
+.gobHQPollForm{margin-top:13px;border-top:1px dashed #dbbcbc;padding-top:12px}.gobHQPollForm label{margin:10px 0}
+@media(max-width:600px){.gobHQNumbers{gap:5px}.gobHQNumbers span{font-size:.67rem}.gobHQNumbers b{font-size:1.4rem}.gobHQArea{padding:10px}.gobHQActions button{flex:1 1 100%}}

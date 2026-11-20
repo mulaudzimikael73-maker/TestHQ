@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id),role=(new URLSearchParams(location.search).get('role')||document.body.dataset.defaultRole)==='mikael'?'mikael':'lizzy';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const WORKER='https://mickyhq-test.mulaudzimikael73.workers.dev/v3/';
+const WORKER='https://mickyhq-test.mulaudzimikael73.workers.dev/';
 const storage={get:k=>{try{return localStorage.getItem(k)||''}catch{return''}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
 let worker=WORKER,hqKey='',state=null,busy=false,polling=false,connected=false,route=[],plates={},wheels=[0,0,0,0],serverOffset=0,audio=null,sound=false,failures=0;
 try{if(parent!==window)hqKey=parent.MikaelHeistSession?.().key||''}catch{}
