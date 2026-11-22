@@ -50,9 +50,11 @@ function baseToViewer(value){
 function readUrl(){try{return localStorage.getItem(PREFIX)||(env==='v3'?localStorage.getItem('mickyHQV3NewspaperSourceV1'):'')||'';}catch{return '';}}
 function saveUrl(s){try{localStorage.setItem(PREFIX,s);}catch{}}
 function render(){
- if(!catalog){target.innerHTML='<p role="alert">University data not loaded. Check uom-data on this HQ.</p>';return;}
+ // The Editorial Desk must render EVEN when the optional University holiday catalog is missing.
+ // Former early return here hid every newspaper control when uom-data failed to load.
  target.innerHTML=`<div class="mickyNews"><div class="mnIntro"><strong>📰 Micky News · ${env==='test'?'TEST HQ':'Main HQ'}</strong><p>Today's national-holiday feature appears here in full, independently of Lizzy's browser. This is also an HQ archive for checking scheduled articles.</p><p class="mnMuted">Current Johannesburg date: <b>${esc(formatDate(today()))}</b>. The dated exclusive remains visible to Lizzy only on its scheduled day.</p></div>
  <div id="gobPart1Desk"></div>
+ ${!catalog?'<p class="mnMuted">Holiday previews are unavailable because the University catalog did not load. Editorial controls remain available above.</p>':''}
  <div class="mnBar"><label>Read a holiday article<select id="mnArticlePick"><option value="today" ${selected==='today'?'selected':''}>🗞️ Today's special edition</option>${arr.map(h=>`<option value="${esc(h.id)}" ${selected===h.id?'selected':''}>${esc(formatDate(h.date))} · ${esc(h.title)}</option>`).join('')}</select></label><button type="button" id="mnRefresh">↻ Refresh articles</button></div>
  <div id="mnArticleArea">${articleArea()}</div>
  <div class="mnEditionPanel"><h3>🗞️ Read the complete ${env==='test'?'TESTR':'V3'} newspaper</h3><p class="mnMuted">Optional: enter the ${env==='test'?'TESTR':'V3'} website URL once to see the original rotating newspaper in this HQ. The date-specific holiday article above works without it.</p><div class="mnBar"><label>${env==='test'?'TESTR':'V3'} site URL<input id="mnBase" type="url" autocomplete="url" placeholder="https://your-lizzyos-site.example/" value="${esc(readUrl())}"></label><button type="button" id="mnLoadEdition">Load full newspaper</button></div><div class="mnStatus" id="mnEditionStatus" role="status"></div><div id="mnFrameHolder"></div></div>
