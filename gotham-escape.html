@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-role="batman">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><meta name="referrer" content="no-referrer"/><meta name="theme-color" content="#0a141d"/>
+<title>Gotham Escape Room — Batman</title><link rel="stylesheet" href="./gotham.css"/></head>
+<body>
+<div class="shell">
+<header class="top"><div class="identity"><div class="emblem" aria-hidden="true">✦</div><div><div class="eyebrow">Wayne Enterprises / Classified</div><div class="brand">GOTHAM <span class="gold">ESCAPE</span></div></div></div><div class="top-right"><span class="pill" id="role-id">Batman</span><div class="signal"><span class="dot off" id="connection-dot"></span><span id="connection-label">Connecting to TEST Worker</span></div></div></header>
+<main>
+<section id="welcome"></section>
+<section id="briefing" class="hidden"></section>
+<section id="play" class="hidden">
+  <section class="chapter"><div><div class="eyebrow" id="room-counter">ROOM 1 OF 4</div><h1 id="chap-title">Wayne Manor Study</h1><p id="chap-sub">Investigate what the manor refuses to explain.</p></div><div style="min-width:160px"><div class="eyebrow" style="text-align:right;margin-bottom:8px" id="num-done">0/12</div><div class="progress" id="progress" aria-label="Mission progress"></div></div></section>
+  <div id="game-interface"><div class="layout"><section class="mainpanel"><div class="roomframe"><div id="scene"></div><div class="scene-label"><span><strong id="scene-title">Wayne Manor Study</strong><span style="display:block" id="scene-caption">Explore interactive objects.</span></span><span class="pill" id="mission-status">PUZZLE 1 / 12</span></div></div><p class="scene-hint">◉ Tap a highlighted marker to inspect its object. Each operative has a different perspective.</p>
+    <div class="switchbar"><button data-tab="scene" class="tab active">◈ Scene</button><button data-tab="evidence" class="tab">▦ Evidence</button><button data-tab="alfred" class="tab">♧ Alfred</button><button data-tab="settings" class="tab">⚙ Settings</button></div>
+    <section id="tab-scene" class="pane card"><h2>Field investigation</h2><div id="detail" class="detail hidden"></div><p class="muted" style="font-size:13px">Select an evidence point in the room or in the investigation console. Discovered clues are saved automatically and can be shared with your partner.</p></section>
+    <section id="tab-evidence" class="pane card hidden"><h2>Evidence board</h2><p class="fine" style="margin-bottom:12px">Personal findings and intentionally shared clues; information remains role-specific until it is shared.</p><div id="evidence-list" class="evidence-list"></div></section>
+    <section id="tab-alfred" class="pane card hidden"><div class="eyebrow">Batcomputer communications</div><h2>Alfred Pennyworth</h2><p class="fine" style="margin-bottom:14px">Alfred can converse and guide, but he cannot disclose puzzle answers or undiscovered evidence.</p><div id="chat-log" class="chat-log" aria-live="polite"></div><div class="chat-box"><input class="input" id="chat-input" placeholder="Ask Alfred a question..." maxlength="480" aria-label="Message Alfred"/><button class="btn primary" id="chat-send">Send</button></div></section>
+    <section id="tab-settings" class="pane card hidden"><h2>Mission settings</h2><label class="field" style="flex-direction:row;align-items:center;margin:12px 0"><input type="checkbox" id="audio-toggle"/> Atmospheric interaction sounds</label><label class="field" style="flex-direction:row;align-items:center;margin:12px 0"><input type="checkbox" id="motion-toggle"/> Reduce animated effects</label><div class="sep"></div><button class="btn secondary small" id="disconnect">Disconnect this screen</button><div id="admin-controls" class="hidden" style="margin-top:12px"><button class="btn secondary small" id="pause-mission">Pause / resume mission (HQ)</button></div><p class="fine" style="margin-top:10px">No game answers are available from this panel. Your progress remains saved on the TEST Worker.</p></section>
+  </section><aside class="console card" id="console-body" aria-live="polite"></aside></div></div>
+  <section id="complete-panel" class="hidden"></section>
+</section>
+</main><div class="foot">GOTHAM STAGE 4 · TESTR / TEST HQ · PRIVATE COOPERATIVE MISSION · TEST ONLY</div></div>
+<div id="chapter-overlay" class="modalwrap hidden" aria-live="polite"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div class="modalwrap hidden" id="hint-modal"><div class="modal card"><div class="eyebrow" id="hint-level">Alfred · Hint</div><h2 style="margin:10px 0">A quiet word from Alfred</h2><p style="color:#cbd9d3;margin-bottom:18px" id="hint-text"></p><button class="btn primary" id="close-hint">Return to investigation</button></div></div>
+<script type="module" src="./gotham-game.js"></script>
+</body></html>
